@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Requests\Course;
+namespace App\Http\Requests\CourseComments;
 
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
 
-class CourseRequest extends FormRequest
+class CourseCommentRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,17 +25,12 @@ class CourseRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required',
-            'description' => 'required',
-            'price' => 'required',
-            'university_id' => [Rule::exists('universities', 'id'), 'required'],
-            'is_active' => 'required',
-            'poster' => 'required',
-            'ratio' => 'required|numeric|max:100',
-            'doctor_id' => [Rule::exists('users', 'id'), 'required']
+            'comment' => 'nullable',
+            'sub_comment' => 'nullable',
+            'video_id' => [Rule::exists('course_contains', 'id'), 'required'],
+            'comment_id' => [Rule::exists('course_comments', 'id'), 'nullable'],
         ];
     }
-
     protected function failedValidation(Validator $validator)
     {
         $response = response()->json([

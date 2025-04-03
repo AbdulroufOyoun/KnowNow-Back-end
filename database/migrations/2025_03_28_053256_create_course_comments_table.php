@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->text('sub_comment')->nullable();
             $table->unsignedBigInteger('video_id');
+            $table->unsignedBigInteger('comment_id')->nullable();
 
             $table->timestamps();
             $table->foreign('user_id')->references('id')->on('users');

@@ -23,6 +23,7 @@ class course extends Model
         'poster',
         'is_active',
         'doctor_id',
+        'ratio',
     ];
 
     /**

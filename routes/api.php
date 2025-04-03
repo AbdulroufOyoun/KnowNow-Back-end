@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CourseCommentController;
 use App\Http\Controllers\CourseContainController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\CourseDescriptionController;
@@ -41,6 +42,10 @@ Route::group(
         // Course Contain
         Route::get('/show_course_contain', [CourseContainController::class, 'index']);
 
+        // Course Comments
+        Route::get('/show_course_comments', [CourseCommentController::class, 'index']);
+        Route::delete('/delete_course_comment', [CourseCommentController::class, 'destroy']);
+
         Route::group(
             ['middleware' => ['role:superAdmin|admin']],
             function () {
@@ -66,6 +71,9 @@ Route::group(
                 // Course Contain
                 Route::post('/add_course_contain', [CourseContainController::class, 'store']);
                 Route::delete('/delete_course_contain', [CourseContainController::class, 'destroy']);
+
+                // Course Comments
+                Route::post('/add_course_comment', [CourseCommentController::class, 'store']);
             }
         );
 

@@ -5,10 +5,10 @@ use Stichoza\GoogleTranslate\GoogleTranslate;
 use function PHPUnit\Framework\isList;
 
 if (!function_exists('Success')) {
-    function Success($message)
+    function Success($message, $is_success = true)
     {
         return response()->json([
-            'success' => true,
+            'success' => $is_success,
             'message' => $message,
             'code' => 200,
             'data' => null,
@@ -18,36 +18,36 @@ if (!function_exists('Success')) {
 }
 
 if (!function_exists('SuccessData')) {
-    function SuccessData($message, $data, $lang = null)
+    function SuccessData($message, $data, $is_success = true)
     {
-        if ($lang) {
-            $tr = new GoogleTranslate('ar');
-            foreach ($data as $items) {
-                try {
-                    $attributes = array_keys($items->toArray());
-                    foreach ($attributes as $item) {
-                        if (is_object($items[$item])) {
-                            foreach ($items as $object) {
-                                $attributes = array_keys($object->toArray());
-                                foreach ($attributes as $attribute) {
-                                    if ($attribute != 'id' && $object[$attribute] != null && $attribute != 'course_id') {
-                                        $object[$attribute] = $tr->setSource('ar')->setTarget('en')->translate($object[$attribute]);
-                                    }
-                                }
-                            }
-                        } else {
-                            if ($item != 'id' && $items[$item] != null && $item != 'course_id') {
-                                $items[$item] = $tr->setSource('ar')->setTarget('en')->translate($items[$item]);
-                            }
-                        }
-                    }
-                } catch (\Throwable $th) {
-                }
-            }
-        }
+        // if ($lang) {
+        //     $tr = new GoogleTranslate('ar');
+        //     foreach ($data as $items) {
+        //         try {
+        //             $attributes = array_keys($items->toArray());
+        //             foreach ($attributes as $item) {
+        //                 if (is_object($items[$item])) {
+        //                     foreach ($items as $object) {
+        //                         $attributes = array_keys($object->toArray());
+        //                         foreach ($attributes as $attribute) {
+        //                             if ($attribute != 'id' && $object[$attribute] != null && $attribute != 'course_id') {
+        //                                 $object[$attribute] = $tr->setSource('ar')->setTarget('en')->translate($object[$attribute]);
+        //                             }
+        //                         }
+        //                     }
+        //                 } else {
+        //                     if ($item != 'id' && $items[$item] != null && $item != 'course_id') {
+        //                         $items[$item] = $tr->setSource('ar')->setTarget('en')->translate($items[$item]);
+        //                     }
+        //                 }
+        //             }
+        //         } catch (\Throwable $th) {
+        //         }
+        //     }
+        // }
 
         return response()->json([
-            'success' => true,
+            'success' => $is_success,
             'message' => $message,
             'code' => 200,
             'data' => $data,

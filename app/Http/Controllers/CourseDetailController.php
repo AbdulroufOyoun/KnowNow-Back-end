@@ -22,6 +22,7 @@ class CourseDetailController extends Controller
         $arr = Arr::only($request->validated(), ['courseId']);
         $where = ['course_id' => $arr['courseId']];
         $ads = $this->publicRepository->ShowAll(CourseDetail::class, $where)->get();
+
         return \SuccessData(__('public.Show'), CourseDetailResource::collection($ads));
     }
 

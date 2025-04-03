@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Course\CourseIdRequest;
 use App\Http\Requests\Course\CourseRequest;
 use App\Http\Requests\Public\SearchRequest;
+use App\Http\Resources\Course\CourseAdminsResource;
 use App\Http\Resources\Course\CourseResource;
 use App\Http\Resources\Public\Search\SearchNameResource;
 use App\Models\course;
@@ -29,7 +30,7 @@ class CourseController extends Controller
     {
         $perPage = \returnPerPage();
         $courses = $this->publicRepository->ShowAll(course::class, [])->paginate($perPage);
-        CourseResource::Collection($courses);
+        CourseAdminsResource::Collection($courses);
         return \Pagination($courses);
     }
 
@@ -38,7 +39,7 @@ class CourseController extends Controller
      */
     public function store(CourseRequest $request)
     {
-        $arr = Arr::only($request->validated(), ['name', 'poster', 'description', 'price', 'university_id', 'is_active', 'doctor_id']);
+        $arr = Arr::only($request->validated(), ['name', 'ratio', 'poster', 'description', 'price', 'university_id', 'is_active', 'doctor_id']);
         $path = 'Images/Courses/';
         $arr['poster'] = \uploadImage($arr['poster'], $path);
         $this->publicRepository->Create(course::class, $arr);
