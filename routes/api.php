@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CollectionController;
+use App\Http\Controllers\CourseCodeController;
 use App\Http\Controllers\CourseCollectionController;
 use App\Http\Controllers\CourseCommentController;
 use App\Http\Controllers\CourseContainController;
@@ -83,6 +84,14 @@ Route::group(
 
                 // Course Comments
                 Route::post('/add_course_comment', [CourseCommentController::class, 'store']);
+
+                // Course Codes
+                Route::get('/show_course_codes', [CourseCodeController::class, 'index']);
+                Route::get('/show_all_course_codes', [CourseCodeController::class, 'indexAll']);
+                Route::get('/specific_course_codes', [CourseCodeController::class, 'show']);
+                Route::post('/add_course_code', [CourseCodeController::class, 'store']);
+                Route::delete('/delete_course_code', [CourseCodeController::class, 'destroy']);
+
 
                 // Collection
                 Route::get('/show_admin_collections', [CollectionController::class, 'adminIndex']);

@@ -17,7 +17,7 @@ class CourseResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'image' => URL::to('Images/Courses', $this->image),
+            'image' => URL::to('Images/Courses', $this->poster),
             'name' => $this->name,
             'description' => $this->description,
             'price' => $this->price,

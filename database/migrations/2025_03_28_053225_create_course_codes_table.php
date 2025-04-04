@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('course_codes', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('course_id');
-            $table->string('code');
+            $table->string('code')->unique();
 
             $table->boolean('is_free')->default(false);
             $table->date('expire_at');
