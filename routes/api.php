@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CollectionController;
+use App\Http\Controllers\CourseCollectionController;
 use App\Http\Controllers\CourseCommentController;
 use App\Http\Controllers\CourseContainController;
 use App\Http\Controllers\CourseController;
@@ -46,6 +48,13 @@ Route::group(
         Route::get('/show_course_comments', [CourseCommentController::class, 'index']);
         Route::delete('/delete_course_comment', [CourseCommentController::class, 'destroy']);
 
+        // Collection
+        Route::get('/show_collections', [CollectionController::class, 'index']);
+        Route::get('/search_collection', [CollectionController::class, 'search']);
+        Route::get('/find_collection', [CollectionController::class, 'find']);
+
+        // Collection Courses
+        Route::get('/show_collection_courses', [CourseCollectionController::class, 'index']);
         Route::group(
             ['middleware' => ['role:superAdmin|admin']],
             function () {
@@ -74,6 +83,18 @@ Route::group(
 
                 // Course Comments
                 Route::post('/add_course_comment', [CourseCommentController::class, 'store']);
+
+                // Collection
+                Route::get('/show_admin_collections', [CollectionController::class, 'adminIndex']);
+                Route::get('/search_admin_collection', [CollectionController::class, 'adminSearch']);
+                Route::get('/find_admin_collection', [CollectionController::class, 'adminFind']);
+                Route::post('/add_collection', [CollectionController::class, 'store']);
+                Route::delete('/delete_collection', [CollectionController::class, 'destroy']);
+
+                // Collection Courses
+                Route::post('/add_collection_courses', [CourseCollectionController::class, 'store']);
+                Route::get('/show_admin_collection_courses', [CourseCollectionController::class, 'adminIndex']);
+                Route::delete('/delete_collection_courses', [CourseCollectionController::class, 'destroy']);
             }
         );
 

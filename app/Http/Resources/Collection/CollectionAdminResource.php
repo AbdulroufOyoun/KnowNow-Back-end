@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Http\Resources\Course;
+namespace App\Http\Resources\Collection;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\URL;
 
-class CourseResource extends JsonResource
+class CollectionAdminResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -17,12 +16,9 @@ class CourseResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'image' => URL::to('Images/Courses', $this->image),
             'name' => $this->name,
-            'description' => $this->description,
             'price' => $this->price,
-            'doctor' => $this->Doctor->name,
-            'university' => $this->University->name,
+            'is_active' => $this->is_active
         ];
     }
 }
