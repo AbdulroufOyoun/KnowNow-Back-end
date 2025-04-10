@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CollectionCodeController;
 use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\CourseCodeController;
 use App\Http\Controllers\CourseCollectionController;
@@ -104,6 +105,13 @@ Route::group(
                 Route::post('/add_collection_courses', [CourseCollectionController::class, 'store']);
                 Route::get('/show_admin_collection_courses', [CourseCollectionController::class, 'adminIndex']);
                 Route::delete('/delete_collection_courses', [CourseCollectionController::class, 'destroy']);
+
+                // Collection Codes
+                Route::get('/show_collection_codes', [CollectionCodeController::class, 'index']);
+                Route::get('/show_all_collection_codes', [CollectionCodeController::class, 'indexAll']);
+                Route::get('/specific_collection_codes', [CollectionCodeController::class, 'show']);
+                Route::post('/add_collection_code', [CollectionCodeController::class, 'store']);
+                Route::delete('/delete_collection_code', [CollectionCodeController::class, 'destroy']);
             }
         );
 

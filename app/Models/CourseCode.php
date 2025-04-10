@@ -36,4 +36,8 @@ class CourseCode extends Model
     {
         return $this->belongsTo(course::class, 'course_id');
     }
+    public function User(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 }

@@ -19,6 +19,7 @@ return new class extends Migration
             $table->date('expire_at');
             $table->unsignedBigInteger('created_by');
             $table->timestamps();
+            $table->softDeletes();
             $table->foreign('collection_id')->references('id')->on('collections');
             $table->foreign('created_by')->references('id')->on('users');
         });

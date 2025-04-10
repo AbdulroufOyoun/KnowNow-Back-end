@@ -8,7 +8,6 @@ use App\Http\Requests\CourseCode\CourseCodeRequest;
 use App\Http\Resources\CourseCode\CourseCodeResource;
 use App\Models\CourseCode;
 use App\Repositories\PublicRepository;
-use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
