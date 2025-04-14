@@ -14,13 +14,16 @@ return new class extends Migration
         Schema::create('user_codes', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('collection_code_id');
+            $table->unsignedBigInteger('collection_code_id')->nullable();
+            $table->unsignedBigInteger('course_code_id')->nullable();
+            $table->boolean('is_free');
 
             $table->timestamps();
             $table->softDeletes();
 
             $table->foreign('user_id')->references('id')->on('users');
             $table->foreign('collection_code_id')->references('id')->on('collection_codes');
+            $table->foreign('course_code_id')->references('id')->on('course_codes');
         });
     }
 

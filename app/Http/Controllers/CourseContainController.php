@@ -2,12 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CoruseContain\PdfRequest;
+use App\Http\Requests\CoruseContain\VideoRequest;
 use App\Http\Requests\Course\CourseIdRequest;
 use App\Http\Requests\CourseContain\CourseContainIdRequest;
 use App\Http\Requests\CourseContain\CourseContainRequest;
 use App\Http\Resources\CourseContain\CourseContainResource;
+use App\Models\CollectionCode;
 use App\Models\course;
+use App\Models\CourseCode;
+use App\Models\CourseCollection;
 use App\Models\CourseContain;
+use App\Models\UserCode;
 use App\Repositories\PublicRepository;
 use ProtoneMedia\LaravelFFMpeg\Support\FFMpeg;
 use Illuminate\Http\Request;
@@ -97,9 +103,25 @@ class CourseContainController extends Controller
         return Storage::disk('secrets')->download($key);
     }
 
-    public function getPdf($pdfName)
+    public function getPdf(PdfRequest $request)
     {
-        return Storage::disk('pdf')->download("pdfFiles/{$pdfName}");
+        $arr = Arr::only($request->validated(), ['pdf']);
+
+        $courseContains = $this->publicRepository->ShowAll(CourseContain::class, ['pdf' => $arr['pdf']])->first()->course_id;
+        $courseCodes = CourseCode::onlyTrashed()->where('course_id', $courseContains)->pluck('id');
+
+        $courseCollections =  $this->publicRepository->ShowAll(CourseCollection::class, ['course_id' => $courseContains])->pluck('collection_id');
+        $collectionCodes = CollectionCode::onlyTrashed()->whereIn('collection_id', $courseCollections)->pluck('id');
+
+        $userCodes = UserCode::where('user_id', \Auth::user()->id)->where(function ($query) use ($courseCodes, $collectionCodes) {
+            $query->whereIn('course_code_id', $courseCodes)
+                ->orWhereIn('collection_code_id', $collectionCodes);
+        })->first();
+        if ($userCodes) {
+            return Storage::disk('pdf')->download("pdfFiles/{$arr['pdf']}");
+        } else {
+            return \Success('لست مشترك بهذه الدورة', false);
+        }
     }
 
     public function getPlaylist($playlist)
@@ -117,7 +139,26 @@ class CourseContainController extends Controller
                 return route('api.video.playlist', ['playlist' => $playlistFilename]);
             });
     }
+    public function showPlaylist(VideoRequest $request)
+    {
+        $arr = Arr::only($request->validated(), ['video']);
 
+        $courseContains = $this->publicRepository->ShowAll(CourseContain::class, ['video' => $arr['video']])->first()->course_id;
+        $courseCodes = CourseCode::onlyTrashed()->where('course_id', $courseContains)->pluck('id');
+
+        $courseCollections =  $this->publicRepository->ShowAll(CourseCollection::class, ['course_id' => $courseContains])->pluck('collection_id');
+        $collectionCodes = CollectionCode::onlyTrashed()->whereIn('collection_id', $courseCollections)->pluck('id');
+
+        $userCodes = UserCode::where('user_id', \Auth::user()->id)->where(function ($query) use ($courseCodes, $collectionCodes) {
+            $query->whereIn('course_code_id', $courseCodes)
+                ->orWhereIn('collection_code_id', $collectionCodes);
+        })->first();
+        if ($userCodes) {
+            return $this->getPlaylist($arr['video']);
+        } else {
+            return \Success('لست مشترك بهذه الدورة', false);
+        }
+    }
     /**
      * Remove the specified resource from storage.
      */

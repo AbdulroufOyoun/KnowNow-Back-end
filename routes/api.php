@@ -10,6 +10,7 @@ use App\Http\Controllers\CourseContainController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\CourseDescriptionController;
 use App\Http\Controllers\CourseDetailController;
+use App\Http\Controllers\UserCodeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -57,6 +58,10 @@ Route::group(
 
         // Collection Courses
         Route::get('/show_collection_courses', [CourseCollectionController::class, 'index']);
+
+        // User Codes
+        Route::post('/add_user_code', [UserCodeController::class, 'store']);
+
         Route::group(
             ['middleware' => ['role:superAdmin|admin']],
             function () {
@@ -115,16 +120,20 @@ Route::group(
             }
         );
 
+        // Route::group(
+        //     ['middleware' => ['subscribed']],
+        //     function () {
+
+        Route::get('/video', [CourseContainController::class, 'showPlaylist']);
+        Route::get('/pdf', [CourseContainController::class, 'getPdf'])->name('api.pdf');
+
+        //     }
+        // );
         // Auth
         Route::delete('/logout', [AuthController::class, 'logout']);
+        Route::get('/vio/secret/{key}', [CourseContainController::class, 'getSecretKey'])->name('api.video.key');
+        Route::get('/vis/{playlist}', [CourseContainController::class, 'getPlaylist'])->name('api.video.playlist');
     }
 );
 
 Route::get('login_error', [AuthController::class, 'loginError'])->name('login');
-
-
-Route::get('/video/secret/{key}', [CourseContainController::class, 'getSecretKey'])->name('api.video.key');
-
-Route::get('/video/{playlist}', [CourseContainController::class, 'getPlaylist'])->name('api.video.playlist');
-
-Route::get('/pdf/{pdfName}', [CourseContainController::class, 'getPdf'])->name('api.pdf');
