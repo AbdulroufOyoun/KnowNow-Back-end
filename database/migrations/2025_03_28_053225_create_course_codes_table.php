@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('course_id');
             $table->string('code')->unique();
+            $table->integer('price');
 
             $table->boolean('is_free')->default(false);
             $table->date('expire_at');

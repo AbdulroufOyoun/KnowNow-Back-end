@@ -9,6 +9,8 @@ use App\Http\Resources\Collection\CollectionAdminResource;
 use App\Http\Resources\Collection\CollectionResource;
 use App\Http\Resources\Public\Search\SearchNameResource;
 use App\Models\Collection;
+use App\Models\CollectionCode;
+use App\Models\UserCode;
 use App\Repositories\PublicRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -34,7 +36,19 @@ class CollectionController extends Controller
         CollectionAdminResource::Collection($courses);
         return \Pagination($courses);
     }
+    public function checkSubscribe(CollectionIdRequest $request)
+    {
+        $collectionArr = Arr::only($request->validated(), ['collectionId']);
+        $collectionCodes = $this->publicRepository->ShowAll(UserCode::class, ['user_id' => \Auth::user()->id, 'course_code_id' => null])->pluck('collection_code_id');
+        $checkCollection = CollectionCode::whereIn('id', $collectionCodes)->where('collection_id', $collectionArr)->exists();
 
+        return response()->json([
+            'success' => true,
+            'message' => __('public.Show'),
+            'code' => 200,
+            'data' => $checkCollection,
+        ], 200);
+    }
     /**
      * Store a newly created resource in storage.
      */

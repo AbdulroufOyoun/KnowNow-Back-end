@@ -19,6 +19,7 @@ class CourseCode extends Model
         'course_id',
         'code',
         'is_free',
+        'price',
         'expire_at',
         'created_by'
     ];

@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Auth\ChangePasswordRequest;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\SignUpRequest;
+use App\Http\Requests\Auth\UpdatefcmTokenRequest;
 use App\Http\Requests\Auth\UserIdRequest;
+use App\Http\Requests\Notification\UpdatefcmtokenRequest as NotificationUpdatefcmtokenRequest;
+use App\Http\Requests\User\UpdatefcmTokenRequest as UserUpdatefcmTokenRequest;
 use App\Http\Resources\Auth\LoginResource;
 
 use App\Repositories\PublicRepository;
@@ -43,7 +46,7 @@ class AuthController extends Controller
         }
         $user->tokens()->delete();
         if (($user['role'] == null && $arr['mobile_uuid'] != $user->mobile_uuid) || ($user->mobile_uuid == null && $arr['mobile_uuid'] == null) || ($user->is_active == 0)) {
-            return   $arr['mobile_uuid'];
+            $arr['mobile_uuid'];
             $disActiveAccount = $this->publicRepository->ShowAll(User::class, $where)->first();
             $disActiveAccount->is_active = 0;
             $disActiveAccount->save();
@@ -110,6 +113,19 @@ class AuthController extends Controller
         $user->tokens()->delete();
         return \Success(__('public.logout'));
     }
+
+    public function UpdateToken(NotificationUpdatefcmtokenRequest $request)
+    {
+        $userArr = Arr::only(
+            $request->validated(),
+            ['fcm_token']
+        );
+        $user = \Auth::user();
+        $user->fcm_token = $userArr['fcm_token'];
+        $user->save();
+        return \Success(__('public.Show'));
+    }
+
 
 
     public function loginError()

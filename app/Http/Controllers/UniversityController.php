@@ -2,17 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\University\UniversityRequest;
 use App\Models\university;
+use App\Repositories\PublicRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class UniversityController extends Controller
 {
+    public function __construct(public PublicRepository $publicRepository) {}
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        $universities = $this->publicRepository->ShowAll(university::class, [])->get();
+        return \SuccessData(__('public.Show'),$universities);
+
     }
 
     /**
@@ -26,9 +33,11 @@ class UniversityController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(UniversityRequest $request)
     {
-        //
+        $arr = Arr::only($request->validated(), ['name']);
+        $this->publicRepository->Create(university::class, $arr);
+        return \Success(__('public.Create'));
     }
 
     /**

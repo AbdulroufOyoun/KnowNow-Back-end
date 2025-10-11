@@ -7,10 +7,19 @@ use App\Http\Requests\Course\CourseRequest;
 use App\Http\Requests\Public\SearchRequest;
 use App\Http\Resources\Course\CourseAdminsResource;
 use App\Http\Resources\Course\CourseResource;
+use App\Http\Resources\Course\SearchCourseResource;
 use App\Http\Resources\Public\Search\SearchNameResource;
+use App\Models\CollectionCode;
 use App\Models\course;
+use App\Models\CourseCode;
+use App\Models\CourseCollection;
+use App\Models\CourseContain;
+use App\Models\SpecializationCourse;
+use App\Models\UserCode;
 use App\Repositories\PublicRepository;
+use Carbon\Carbon;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\URL;
 
 class CourseController extends Controller
 {
@@ -34,15 +43,76 @@ class CourseController extends Controller
         return \Pagination($courses);
     }
 
+    public function userCourses()
+    {
+        $user = \Auth::user();
+        $userSubscribes = $this->publicRepository->ShowAll(UserCode::class, ['user_id' => $user->id])->get();
+        $userCoursesIds = [];
+
+        foreach ($userSubscribes as $userSubscribe) {
+            if ($userSubscribe->course_code_id) {
+                $courseCodes = CourseCode::onlyTrashed()
+                    ->where('id', $userSubscribe->course_code_id)
+                    ->where('expire_at','>',Carbon::now())
+                    ->pluck('course_id')
+                    ->toArray();
+                $userCoursesIds = array_merge($userCoursesIds, $courseCodes);
+            }
+            if ($userSubscribe->collection_code_id) {
+                $collectionCodes = CollectionCode::onlyTrashed()
+                    ->where('id', $userSubscribe->collection_code_id)
+                    ->pluck('collection_id')
+                    ->where('expire_at','>',Carbon::now())
+                    ->toArray();
+
+                $collectionCourses = CourseCollection::whereIn('collection_id', $collectionCodes)
+                    ->pluck('course_id')
+                    ->toArray();
+
+                $userCoursesIds = array_merge($userCoursesIds, $collectionCourses);
+            }
+        }
+
+        $courses = course::whereIn('id', $userCoursesIds)->get();
+        $coursesData = []; // Create a separate array to store modified course data
+
+        foreach ($courses as $course) {
+            $courseData = $course->toArray(); // Convert the course object to an array for safe modifications
+            $courseData['image'] = URL::to('Images/Courses', $course->poster); // Use Eloquent attribute directly
+
+            $where = ['course_id' => $course->id];
+            $courseContains = $this->publicRepository->ShowAll(CourseContain::class, $where)->get();
+
+            $courseData['theoretical'] = [];
+            $courseData['practical'] = [];
+
+            foreach ($courseContains as $courseContain) {
+                if ($courseContain->is_theoretical) {
+                    $courseData['theoretical'][] = $courseContain;
+                } else {
+                    $courseData['practical'][] = $courseContain;
+                }
+            }
+
+            $coursesData[] = $courseData; // Collect the modified course data
+        }
+
+        return \SuccessData(__('public.Show'), $coursesData);
+    }
     /**
      * Store a newly created resource in storage.
      */
     public function store(CourseRequest $request)
     {
         $arr = Arr::only($request->validated(), ['name', 'ratio', 'poster', 'description', 'price', 'university_id', 'is_active', 'doctor_id']);
+        $specialization=Arr::only($request->validated(),['year','chapter','specialization_id']);
         $path = 'Images/Courses/';
         $arr['poster'] = \uploadImage($arr['poster'], $path);
-        $this->publicRepository->Create(course::class, $arr);
+
+        $course =$this->publicRepository->Create(course::class, $arr);
+        $specialization['course_id'] = $course->id;
+        $this->publicRepository->Create(SpecializationCourse::class, $specialization);
+
         return \Success(__('public.Create'));
     }
 
@@ -50,7 +120,7 @@ class CourseController extends Controller
     {
         $searchArr = Arr::only($request->validated(), ['name']);
         $cities = course::where('name', 'LIKE', "%{$searchArr['name']}%")->orWhere('name', $searchArr['name'])->where('is_active', 1)->get();
-        return \SuccessData(__('public.Show'), SearchNameResource::collection($cities));
+        return \SuccessData(__('public.Show'), CourseResource::collection($cities));
     }
 
     public function find(CourseIdRequest $request)

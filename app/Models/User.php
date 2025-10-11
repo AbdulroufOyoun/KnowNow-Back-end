@@ -25,6 +25,7 @@ class User extends Authenticatable
         'mobile_uuid',
         'is_active',
         'email',
+        'fcm_token',
         'password',
     ];
 

@@ -49,7 +49,7 @@ return [
         ],
         'pdf' => [
             'driver' => 'local',
-            'root' => storage_path('pdfs'),
+            'root' => storage_path('app/public/pdfs'),
         ],
         'secrets' => [
             'driver' => 'local',

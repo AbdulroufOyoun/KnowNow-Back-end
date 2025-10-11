@@ -36,7 +36,8 @@ class UserCodeController extends Controller
      */
     public function store(UserCodeRequest $request)
     {
-        $arr = Arr::only($request->validated(), ['collection_code', 'course_code', 'item_id']);
+         $arr = Arr::only($request->validated(), ['collection_code', 'course_code', 'item_id']);
+
         if ($arr['course_code'] && $arr['collection_code']) {
             \Success('There is no Code!!', false);
         }

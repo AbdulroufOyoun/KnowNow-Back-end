@@ -6,6 +6,7 @@ use App\Http\Requests\Course\CourseIdRequest;
 use App\Http\Requests\CourseCode\CourseCodeIdRequest;
 use App\Http\Requests\CourseCode\CourseCodeRequest;
 use App\Http\Resources\CourseCode\CourseCodeResource;
+use App\Models\course;
 use App\Models\CourseCode;
 use App\Repositories\PublicRepository;
 use Illuminate\Support\Arr;
@@ -41,6 +42,8 @@ class CourseCodeController extends Controller
         $arr = Arr::only($request->validated(), ['course_id', 'is_free', 'expire_at']);
         $arr['created_by'] = \Auth::user()->id;
         $arr['code'] = Str::upper(Str::random(3)) . Str::lower(Str::random(2)) . rand(0, 9);
+        $course = $this->publicRepository->ShowById(course::class,$arr['course_id']);
+        $arr['price']=$course->price;
         $this->publicRepository->Create(CourseCode::class, $arr);
         return \Success(__('public.Create'));
     }

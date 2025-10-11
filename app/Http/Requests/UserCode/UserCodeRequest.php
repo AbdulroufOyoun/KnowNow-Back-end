@@ -27,14 +27,14 @@ class UserCodeRequest extends FormRequest
         return [
             'collection_code' => [Rule::exists('collection_codes', 'code'), 'nullable'],
             'course_code' => [Rule::exists('course_codes', 'code'), 'nullable'],
-            'item_id' => [Rule::exists('course_codes', 'id'), 'required'],
+            'item_id' =>  'required',
         ];
     }
     protected function failedValidation(Validator $validator)
     {
         $response = response()->json([
             'success' => false,
-            'message' => $validator->errors()->first(),
+            'message' =>  $validator->errors()->first(),
             'code' => 422,
             'data' => null,
         ], 422);

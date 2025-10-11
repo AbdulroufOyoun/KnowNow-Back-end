@@ -4,19 +4,22 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class university extends Model
+class SpecializationCourse extends Model
 {
     use HasFactory;
-   /**
+       /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
-        'is_active'
-
+        'chapter',
+        'course_id',
+        'year',
+        'specialization_id'
     ];
 
     /**
@@ -29,4 +32,9 @@ class university extends Model
         'created_at',
         'updated_at'
     ];
+
+        public function Course(): BelongsTo
+    {
+        return $this->BelongsTo(Course::class, 'course_id');
+    }
 }

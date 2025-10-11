@@ -41,7 +41,33 @@ class CourseContainController extends Controller
         $courseContains = $this->publicRepository->ShowAll(CourseContain::class, $where)->get();
         $contain['theoretical'] = [];
         $contain['practical'] = [];
-
+        $contain['is_subscribed'] = false;
+        $user = \Auth::user();
+        $userRole = $user->getRoleNames();
+        $userCodes =  $this->publicRepository->ShowAll(UserCode::class, ['user_id' => $user->id])->get();
+        if (count($userRole) > 0 && ($userRole[0] === 'superAdmin' || $userRole[0] === 'admin')) {
+            $contain['is_subscribed'] = true;
+        } else {
+            foreach ($userCodes as $userCode) {
+                if ($userCode->course_code_id) {
+                    $courseCodes = CourseCode::onlyTrashed()->where('id', $userCode->course_code_id)->pluck('course_id');
+                    foreach ($courseCodes as $courseCode) {
+                        if ($courseCode == $arr['courseId']) {
+                            $contain['is_subscribed'] = true;
+                        }
+                    }
+                }
+                if ($userCode->collection_code_id) {
+                    $collectionCodes = CollectionCode::onlyTrashed()->where('id', $userCode->user_code_id)->pluck('collection_id');
+                    $collectionCourses = CourseCollection::whereIn('id', $collectionCodes)->get();
+                    foreach ($collectionCourses as $collectionCourse) {
+                        if ($collectionCourse->course_id == $arr['courseId']) {
+                            $contain['is_subscribed'] = true;
+                        }
+                    }
+                }
+            }
+        }
         foreach ($courseContains as $courseContain) {
             if ($courseContain->is_theoretical) {
                 $contain['theoretical'][] = $courseContain;
@@ -55,9 +81,17 @@ class CourseContainController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function pdfs(Request $request)
     {
-        //
+ $arr = $request->query('coursesIds');
+
+         $courses = CourseContain::whereIn('course_id', json_decode($arr))->get();
+        $pdfs = [];
+        foreach ($courses as $course) {
+            $pdfs[]=$course->pdf;
+        }
+        return \SuccessData(__('public.Show'), $pdfs);
+
     }
 
     /**
@@ -75,6 +109,7 @@ class CourseContainController extends Controller
         $videoName = pathinfo($arr['video']->getClientOriginalName(), PATHINFO_FILENAME);
         $newName = rand(9999999999, 99999999999) . $videoName;
         $arr['video']->storeAs('uploads', "{$newName}.mp4", 'uploads');
+
         $lowFormat  = (new X264('aac'))->setKiloBitrate(360);
         $highFormat = (new X264('aac'))->setKiloBitrate(720);
 
@@ -98,19 +133,23 @@ class CourseContainController extends Controller
         return \Success(__('public.Create'));
     }
 
-    public function getSecretKey($key)
+    public function getSecretKey($key,$playlist)
     {
         return Storage::disk('secrets')->download($key);
     }
 
-    public function getPdf(PdfRequest $request)
+    public function getPdf(Request $request)
     {
-        $arr = Arr::only($request->validated(), ['pdf']);
+        // $arr = Arr::only($request->validated(), ['pdf']);
+        $arr = $request->route('pdf');
 
-        $courseContains = $this->publicRepository->ShowAll(CourseContain::class, ['pdf' => $arr['pdf']])->first()->course_id;
-        $courseCodes = CourseCode::onlyTrashed()->where('course_id', $courseContains)->pluck('id');
+        $courseContains = $this->publicRepository->ShowAll(CourseContain::class, ['pdf' => $arr])->first();
+        if ($courseContains->is_free) {
+            return Storage::disk('pdf')->download("pdfFiles/{$arr}");
+        }
+        $courseCodes = CourseCode::onlyTrashed()->where('course_id', $courseContains->course_id)->pluck('id');
 
-        $courseCollections =  $this->publicRepository->ShowAll(CourseCollection::class, ['course_id' => $courseContains])->pluck('collection_id');
+        $courseCollections =  $this->publicRepository->ShowAll(CourseCollection::class, ['course_id' => $courseContains->course_id])->pluck('collection_id');
         $collectionCodes = CollectionCode::onlyTrashed()->whereIn('collection_id', $courseCollections)->pluck('id');
 
         $userCodes = UserCode::where('user_id', \Auth::user()->id)->where(function ($query) use ($courseCodes, $collectionCodes) {
@@ -118,7 +157,7 @@ class CourseContainController extends Controller
                 ->orWhereIn('collection_code_id', $collectionCodes);
         })->first();
         if ($userCodes) {
-            return Storage::disk('pdf')->download("pdfFiles/{$arr['pdf']}");
+            return Storage::disk('pdf')->download("pdfFiles/{$arr}");
         } else {
             return \Success('لست مشترك بهذه الدورة', false);
         }
@@ -129,35 +168,29 @@ class CourseContainController extends Controller
         return FFMpeg::dynamicHLSPlaylist()
             ->fromDisk('public')
             ->open("videos/{$playlist}")
-            ->setKeyUrlResolver(function ($key) {
-                return route('api.video.key', ['key' => $key]);
+            ->setKeyUrlResolver(function ($key) use ($playlist) {
+                return route('web.video.key', [
+                    'key' => $key,
+                    'playlist' => $playlist
+                ]);
             })
-            ->setMediaUrlResolver(function ($mediaFilename) {
+            ->setMediaUrlResolver(function ($mediaFilename) use ($playlist) {
                 return Storage::disk('public')->url("videos/{$mediaFilename}");
             })
-            ->setPlaylistUrlResolver(function ($playlistFilename) {
-                return route('api.video.playlist', ['playlist' => $playlistFilename]);
+            ->setPlaylistUrlResolver(function ($playlistFilename) use ($playlist) {
+                return route('web.video.playlist', [
+                    'playlist' => $playlistFilename
+                ]);
             });
     }
-    public function showPlaylist(VideoRequest $request)
+
+    public function showPlaylist(Request $request)
     {
-        $arr = Arr::only($request->validated(), ['video']);
+        $playlist = $request->route('playlist');
+        // $arr = Arr::only($request->validated(), ['playlist']);
 
-        $courseContains = $this->publicRepository->ShowAll(CourseContain::class, ['video' => $arr['video']])->first()->course_id;
-        $courseCodes = CourseCode::onlyTrashed()->where('course_id', $courseContains)->pluck('id');
+            return $this->getPlaylist($playlist );
 
-        $courseCollections =  $this->publicRepository->ShowAll(CourseCollection::class, ['course_id' => $courseContains])->pluck('collection_id');
-        $collectionCodes = CollectionCode::onlyTrashed()->whereIn('collection_id', $courseCollections)->pluck('id');
-
-        $userCodes = UserCode::where('user_id', \Auth::user()->id)->where(function ($query) use ($courseCodes, $collectionCodes) {
-            $query->whereIn('course_code_id', $courseCodes)
-                ->orWhereIn('collection_code_id', $collectionCodes);
-        })->first();
-        if ($userCodes) {
-            return $this->getPlaylist($arr['video']);
-        } else {
-            return \Success('لست مشترك بهذه الدورة', false);
-        }
     }
     /**
      * Remove the specified resource from storage.

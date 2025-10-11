@@ -32,7 +32,11 @@ class CourseRequest extends FormRequest
             'is_active' => 'required',
             'poster' => 'required',
             'ratio' => 'required|numeric|max:100',
-            'doctor_id' => [Rule::exists('users', 'id'), 'required']
+            'doctor_id' => [Rule::exists('users', 'id'), 'required'],
+            'year'=>'required|integer|between:1,5',
+            'chapter'=>'required|integer|between:1,2',
+            'specialization_id' => [Rule::exists('specializations', 'id'), 'required'],
+
         ];
     }
 

@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Resources\Auth;
+namespace App\Http\Resources\Course;
 
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\URL;
 
-class LoginResource extends JsonResource
+class SearchCourseResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -17,12 +17,8 @@ class LoginResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'email' => $this->email,
+            'image' => URl::to('Images/Courses', $this->poster),
             'name' => $this->name,
-            'phone' => $this->phone,
-            'role' => $this->role,
-            'token' => $this->token->accessToken,
-            'token_expire_at' => Carbon::parse($this->token->token->expires_at)->format('Y-m-d'),
         ];
     }
 }

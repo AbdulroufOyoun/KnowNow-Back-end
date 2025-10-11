@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Requests\CoruseContain;
+namespace App\Http\Requests\University;
 
 use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class VideoRequest extends FormRequest
+class UniversityIdRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,7 +25,7 @@ class VideoRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'playlist' => [Rule::exists('course_contains', 'video'), 'required']
+            'university_id' => [Rule::exists('universities', 'id'), 'required']
         ];
     }
     protected function failedValidation(Validator $validator)

@@ -20,31 +20,6 @@ if (!function_exists('Success')) {
 if (!function_exists('SuccessData')) {
     function SuccessData($message, $data, $is_success = true)
     {
-        // if ($lang) {
-        //     $tr = new GoogleTranslate('ar');
-        //     foreach ($data as $items) {
-        //         try {
-        //             $attributes = array_keys($items->toArray());
-        //             foreach ($attributes as $item) {
-        //                 if (is_object($items[$item])) {
-        //                     foreach ($items as $object) {
-        //                         $attributes = array_keys($object->toArray());
-        //                         foreach ($attributes as $attribute) {
-        //                             if ($attribute != 'id' && $object[$attribute] != null && $attribute != 'course_id') {
-        //                                 $object[$attribute] = $tr->setSource('ar')->setTarget('en')->translate($object[$attribute]);
-        //                             }
-        //                         }
-        //                     }
-        //                 } else {
-        //                     if ($item != 'id' && $items[$item] != null && $item != 'course_id') {
-        //                         $items[$item] = $tr->setSource('ar')->setTarget('en')->translate($items[$item]);
-        //                     }
-        //                 }
-        //             }
-        //         } catch (\Throwable $th) {
-        //         }
-        //     }
-        // }
 
         return response()->json([
             'success' => $is_success,
@@ -59,15 +34,7 @@ if (!function_exists('Pagination')) {
     function Pagination($data)
     {
         $data = $data->toArray();
-        // $tr = new GoogleTranslate('ar'); // Translates into English
-        // foreach ($data as $items) {
-        //     $attributes = array_keys($items->toArray());
-        //     foreach ($attributes as $item) {
-        //         if ($item != 'id' && $items[$item] != null) {
-        //             $items[$item] = $tr->setSource('en')->setTarget('ar')->translate($items[$item]);
-        //         }
-        //     }
-        // }
+
         return response()->json([
             'success' => true,
             'message' => 'Found Successfully',
