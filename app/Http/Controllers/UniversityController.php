@@ -17,7 +17,7 @@ class UniversityController extends Controller
      */
     public function index()
     {
-        $universities = $this->publicRepository->ShowAll(university::class, [])->get();
+        $universities = $this->publicRepository->ShowAll(university::class, ['is_active'=>1])->get();
         return \SuccessData(__('public.Show'),$universities);
 
     }

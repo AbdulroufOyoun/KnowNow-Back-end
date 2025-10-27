@@ -36,6 +36,15 @@ return [
             'throw' => false,
         ],
 
+        'obs' => [
+        'driver' => 'obs',
+        'access_key' => env('OBS_ACCESS_KEY'),
+        'secret_key' => env('OBS_SECRET_KEY'),
+        'bucket'     => env('OBS_BUCKET'),
+        'endpoint'   => env('OBS_ENDPOINT'),
+        'region'     => env('OBS_REGION'),
+    ],
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),

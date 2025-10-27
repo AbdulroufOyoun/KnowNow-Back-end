@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Resources\CollectionCourses;
+namespace App\Http\Resources\Collection;
 
 use App\Http\Resources\Course\CourseResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class AdminCollectionCoursesResource extends JsonResource
+class CollectionBarrenResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,9 +16,11 @@ class AdminCollectionCoursesResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
-            'price' => $this->price,
-            'course' => new CourseResource($this->Courses)
+            'course'=>new CourseResource($this->Courses),
+            'count'=>$this->count,
+            'totalMony'=>$this->totalMony,
+            'doctorBarren'=>$this->doctorBarren,
+            'price'=>$this->price,
         ];
     }
 }

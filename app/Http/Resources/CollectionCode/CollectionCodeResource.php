@@ -23,6 +23,8 @@ class CollectionCodeResource extends JsonResource
             'created_by' => new UserResource($this->User),
             'collection' => new CollectionResource($this->Collection),
             'expire_at' => Carbon::parse($this->expire_at)->format('Y-m-d'),
+            'created_at' =>  Carbon::parse($this->created_at)->format('Y-m-d'),
+
 
         ];
     }

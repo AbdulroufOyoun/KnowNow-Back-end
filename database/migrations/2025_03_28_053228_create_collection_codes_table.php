@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('collection_id');
             $table->string('code')->uniqid();
+            $table->integer('price');
             $table->boolean('is_free')->default(false);
             $table->date('expire_at');
             $table->unsignedBigInteger('created_by');

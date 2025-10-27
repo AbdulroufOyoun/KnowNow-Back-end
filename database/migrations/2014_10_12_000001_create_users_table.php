@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
-            $table->bigInteger('phone');
+            $table->string('phone');
             $table->string('fcm_token')->nullable();
 
             $table->unsignedBigInteger('university_id')->nullable();

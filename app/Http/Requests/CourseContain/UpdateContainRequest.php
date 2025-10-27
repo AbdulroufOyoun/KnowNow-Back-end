@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Notification;
-use Illuminate\Validation\Rule;
+namespace App\Http\Requests\CourseContain;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class NotificationRequest extends FormRequest
+class UpdateContainRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,9 +22,12 @@ class NotificationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required',
-            'description' => 'required',
-            'university_id' =>  'required'
+            'courseContainId' => 'required',
+
+            'name' => 'nullable',
+            'video' => 'nullable|file|mimes:mp4',
+            'pdf' => 'nullable|file|mimes:pdf',
+
         ];
     }
 }

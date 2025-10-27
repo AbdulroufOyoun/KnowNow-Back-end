@@ -17,14 +17,16 @@ class CourseAdminsResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'image' => URL::to('Images/Courses', $this->image),
+            'image' => URL::to('Images/Courses', $this->poster),
             'name' => $this->name,
             'description' => $this->description,
             'price' => $this->price,
             'doctor' => $this->Doctor->name,
             'university' => $this->University->name,
             'is_active' => $this->is_active,
-            'ratio' => $this->ratio
+            'ratio' => $this->ratio,
+            'year' => $this->Year ? $this->Year->year : null,
+            'chapter' => $this->Year ? $this->Year->chapter : null,
         ];
     }
 }

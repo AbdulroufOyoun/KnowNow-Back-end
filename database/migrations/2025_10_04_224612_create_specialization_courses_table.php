@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
                         $table->unsignedBigInteger('course_id');
                         $table->unsignedBigInteger('specialization_id');
-            $table->string('chapter');
+            $table->integer('chapter');
             $table->integer('year');
 
             $table->timestamps();

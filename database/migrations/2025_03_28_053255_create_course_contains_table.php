@@ -18,6 +18,7 @@ return new class extends Migration
             $table->text('pdf');
             $table->unsignedBigInteger('course_id');
             $table->boolean('is_free');
+            $table->boolean('is_active')->default(0);
             $table->boolean('is_theoretical');
 
             $table->timestamps();

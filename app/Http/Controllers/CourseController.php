@@ -20,6 +20,7 @@ use App\Repositories\PublicRepository;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Http\Request;
 
 class CourseController extends Controller
 {
@@ -145,6 +146,23 @@ class CourseController extends Controller
         $courseArr = Arr::only($request->validated(), ['courseId']);
         $course = $this->publicRepository->ShowById(course::class, $courseArr['courseId']);
         return \SuccessData(__('public.Show'), new  CourseResource($course));
+    }
+
+        public function toggleStatus(CourseIdRequest $request)
+    {
+        $courseArr = Arr::only($request->validated(), ['courseId']);
+        $course = $this->publicRepository->ShowById(course::class, $courseArr['courseId']);
+        $course->is_active = !$course->is_active;
+        $course->save();
+        return \Success(__('public.Show'));
+    }
+
+    public function Update(Request $request)
+    {
+        $course = $this->publicRepository->ShowById(course::class, $request->courseId);
+        $course->is_active = !$course->is_active;
+        $course->save();
+        return \Success(__('public.Show'));
     }
     /**
      * Remove the specified resource from storage.

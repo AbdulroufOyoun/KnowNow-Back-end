@@ -3,6 +3,7 @@
 namespace App\Http\Resources\CourseCode;
 
 use App\Http\Resources\Course\CourseResource;
+use App\Http\Resources\User\StudentResource;
 use App\Http\Resources\User\UserResource;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -20,9 +21,13 @@ class CourseCodeResource extends JsonResource
         return [
             'id' => $this->id,
             'code' =>  $this->code,
+            'is_free' =>  $this->is_free,
+            'price' =>  $this->price,
             'created_by' => new UserResource($this->User),
-            'course' => new CourseResource($this->Course),
+            // 'course' => new CourseResource($this->Course),
+            'user' => new StudentResource($this->User),
             'expire_at' => Carbon::parse($this->expire_at)->format('Y-m-d'),
+            'created_at' =>  Carbon::parse($this->created_at)->format('Y-m-d'),
 
         ];
     }

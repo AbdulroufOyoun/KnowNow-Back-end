@@ -10,7 +10,7 @@ use App\Http\Requests\Auth\UserIdRequest;
 use App\Http\Requests\Notification\UpdatefcmtokenRequest as NotificationUpdatefcmtokenRequest;
 use App\Http\Requests\User\UpdatefcmTokenRequest as UserUpdatefcmTokenRequest;
 use App\Http\Resources\Auth\LoginResource;
-
+use App\Http\Resources\User\StudentResource;
 use App\Repositories\PublicRepository;
 
 use App\Models\User;
@@ -89,8 +89,10 @@ class AuthController extends Controller
     }
     public function Doctors()
     {
-        $admins = User::role('doctor')->get();
-        return \SuccessData(__('public.Show'), $admins);
+        $perPage = \returnPerPage();
+        $users = User::role('doctor')->paginate($perPage);
+        StudentResource::collection($users);
+        return \Pagination($users);
     }
     public function makeDoctor(UserIdRequest $request)
     {
@@ -146,7 +148,6 @@ class AuthController extends Controller
             throw ValidationException::withMessages([__('public.authFailed')]);
         }
         $this->publicRepository->update($model, $person->id, ['password' => $arr['new_password']]);
-        $person->tokens()->delete();
-        return \Success(__('public.password_update'));
+         return \Success(__('public.password_update'));
     }
 }

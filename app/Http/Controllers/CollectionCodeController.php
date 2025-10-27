@@ -6,6 +6,7 @@ use App\Http\Requests\Collection\CollectionIdRequest;
 use App\Http\Requests\CollectionCode\CollectionCodeIdRequest;
 use App\Http\Requests\CollectionCode\CollectionCodeRequest;
 use App\Http\Resources\CollectionCode\CollectionCodeResource;
+use App\Models\Collection;
 use App\Models\CollectionCode;
 use App\Repositories\PublicRepository;
 use Illuminate\Support\Arr;
@@ -40,6 +41,8 @@ class CollectionCodeController extends Controller
     {
         $arr = Arr::only($request->validated(), ['collection_id', 'is_free', 'expire_at']);
         $arr['created_by'] = \Auth::user()->id;
+         $collection = $this->publicRepository->ShowAll(Collection::class, ['id'=>$arr['collection_id']])->first();
+        $arr['price']=$collection->price;
         $arr['code'] = Str::upper(Str::random(3)) . Str::lower(Str::random(2)) . rand(0, 9);
         $this->publicRepository->Create(CollectionCode::class, $arr);
         return \Success(__('public.Create'));

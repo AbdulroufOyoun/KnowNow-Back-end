@@ -16,6 +16,7 @@ use App\Http\Controllers\SpecializationController;
 use App\Http\Controllers\SpecializationCourseController;
 use App\Http\Controllers\UniversityController;
 use App\Http\Controllers\UserCodeController;
+use App\Http\Controllers\UserController;
 use App\Models\CourseContain;
 use App\Models\university;
 use Illuminate\Http\Request;
@@ -36,12 +37,13 @@ use Illuminate\Support\Facades\Route;
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/signUp', [AuthController::class, 'signUp']);
 
+        // University
+        Route::get('/show_universities', [UniversityController::class, 'index']);
+
 Route::group(
     ['middleware' => ['auth:api']],
     function () {
 
-        // University
-        Route::get('/show_universities', [UniversityController::class, 'index']);
 
                 // Specialization
         Route::get('/show_specializations', [SpecializationController::class, 'index']);
@@ -66,6 +68,8 @@ Route::group(
         // Course Contain
         Route::get('/show_course_contain', [CourseContainController::class, 'index']);
         Route::get('/show_courses_pdf', [CourseContainController::class, 'pdfs']);
+        Route::get('/toggle_contain', [CourseContainController::class, 'toggle']);
+        Route::get('/toggle_contain_activity', [CourseContainController::class, 'toggleActive']);
 
 
         // Course Comments
@@ -99,13 +103,24 @@ Route::group(
                 Route::post('/add_university', [UniversityController::class, 'store']);
 
                 //Specialization
+                Route::get('/show_admin_specialization', [SpecializationCourseController::class, 'adminIndex']);
                 Route::post('/add_specialization', [SpecializationController::class, 'store']);
+                Route::get('/show_specialization_courses', [SpecializationCourseController::class, 'indexSpecializationCourses']);
+                Route::get('/show_course_specializations', [SpecializationCourseController::class, 'indexCourseSpecializations']);
+                Route::get('/show_allowed_specializations', [SpecializationCourseController::class, 'show']);
+                Route::post('/add_specialization_courses', [SpecializationCourseController::class, 'store']);
+                Route::post('/delete_specialization_course', [SpecializationCourseController::class, 'destroy']);
+
+                Route::post('/update_specialization_courses', [SpecializationCourseController::class, 'update']);
 
                 // Course
                 Route::get('/show_admin_courses', [CourseController::class, 'adminIndex']);
                 Route::get('/search_admin_course', [CourseController::class, 'adminSearch']);
                 Route::get('/find_admin_course', [CourseController::class, 'adminFind']);
+                Route::get('/toggle_course_status', [CourseController::class, 'toggleStatus']);
                 Route::post('/add_course', [CourseController::class, 'store']);
+                Route::post('/update_course', [CourseController::class, 'update']);
+
                 Route::delete('/delete_course', [CourseController::class, 'destroy']);
 
                 // Course Details
@@ -118,6 +133,7 @@ Route::group(
 
                 // Course Contain
                 Route::post('/add_course_contain', [CourseContainController::class, 'store']);
+                Route::post('/update_course_contain', [CourseContainController::class, 'update']);
                 Route::delete('/delete_course_contain', [CourseContainController::class, 'destroy']);
 
                 // Course Comments
@@ -125,7 +141,10 @@ Route::group(
 
                 // Course Codes
                 Route::get('/show_course_codes', [CourseCodeController::class, 'index']);
+                Route::get('/show_course_Subscriptions', [CourseCodeController::class, 'courseSubscriptions']);
                 Route::get('/show_all_course_codes', [CourseCodeController::class, 'indexAll']);
+                Route::post('/show_course_barren', [CourseCodeController::class, 'barren']);
+                Route::post('/show_doctor_barren', [CourseCodeController::class, 'doctorBarren']);
                 Route::get('/specific_course_codes', [CourseCodeController::class, 'show']);
                 Route::post('/add_course_code', [CourseCodeController::class, 'store']);
                 Route::delete('/delete_course_code', [CourseCodeController::class, 'destroy']);
@@ -134,11 +153,16 @@ Route::group(
                 Route::get('/show_admin_collections', [CollectionController::class, 'adminIndex']);
                 Route::get('/search_admin_collection', [CollectionController::class, 'adminSearch']);
                 Route::get('/find_admin_collection', [CollectionController::class, 'adminFind']);
+                Route::post('/show_collection_barren', [CollectionController::class, 'barren']);
+
                 Route::post('/add_collection', [CollectionController::class, 'store']);
+                Route::post('/update_collection', [CollectionController::class, 'update']);
+                Route::get('/toggle_collection', [CollectionController::class, 'toggle']);
                 Route::delete('/delete_collection', [CollectionController::class, 'destroy']);
 
                 // Collection Courses
                 Route::post('/add_collection_courses', [CourseCollectionController::class, 'store']);
+                Route::post('/update_collection_courses', [CourseCollectionController::class, 'update']);
                 Route::get('/show_admin_collection_courses', [CourseCollectionController::class, 'adminIndex']);
                 Route::delete('/delete_collection_courses', [CourseCollectionController::class, 'destroy']);
 
@@ -148,6 +172,10 @@ Route::group(
                 Route::get('/specific_collection_codes', [CollectionCodeController::class, 'show']);
                 Route::post('/add_collection_code', [CollectionCodeController::class, 'store']);
                 Route::delete('/delete_collection_code', [CollectionCodeController::class, 'destroy']);
+
+                // Users
+                Route::get('/show_students', [UserController::class, 'students']);
+                Route::get('/toggle_user', [UserController::class, 'toggleStatus']);
 
                 // Media
                 Route::post('/update_media/{media}', [MediaController::class, 'update']);
@@ -169,8 +197,11 @@ Route::group(
         Route::post('/update_token', [AuthController::class, 'UpdateToken']);
 
 
+        Route::post('/change_password', [AuthController::class, 'SelfChangePassword']);
 
     }
+
+
 );
 
 

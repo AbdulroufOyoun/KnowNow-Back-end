@@ -25,8 +25,8 @@ class CourseCollectionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'coursesIds' => ['required', 'array'], // Ensure it's an array
-            'coursesIds.*.course_id' => [Rule::exists('courses', 'id')], // Validate each item
+            'price' => ['required'], // Ensure it's an array
+            'course_id' => [Rule::exists('courses', 'id'),'required'], // Validate each item
             'collection_id' => [Rule::exists('collections', 'id'), 'required']
         ];
     }

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "94859383f35e2629f111cf3e82a27f31",
+    "content-hash": "c84ec4da0e770b2a391a90a12ac2c1bb",
     "packages": [
         {
             "name": "beste/clock",
@@ -3746,6 +3746,124 @@
                 "source": "https://github.com/jmespath/jmespath.php/tree/2.8.0"
             },
             "time": "2024-09-04T18:46:31+00:00"
+        },
+        {
+            "name": "mubbi/esdk-obs-php",
+            "version": "3.24.10",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mubbi/huaweicloud-sdk-php-obs.git",
+                "reference": "42fd152d17ad9c82ee56dc71c7e2534f05933eaa"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mubbi/huaweicloud-sdk-php-obs/zipball/42fd152d17ad9c82ee56dc71c7e2534f05933eaa",
+                "reference": "42fd152d17ad9c82ee56dc71c7e2534f05933eaa",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^6.3.0 || ^7.0",
+                "guzzlehttp/psr7": "^1.4.2 || ^2.0",
+                "monolog/monolog": "^1.23.0 || ^2.0 || ^3.0",
+                "php": ">=5.6.0",
+                "psr/http-message": "^1.0 || ^2.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Obs\\": "Obs/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "description": "OBS PHP SDK",
+            "keywords": [
+                "OBS",
+                "php"
+            ],
+            "support": {
+                "source": "https://github.com/mubbi/huaweicloud-sdk-php-obs/tree/3.24.10"
+            },
+            "time": "2025-08-04T06:16:13+00:00"
+        },
+        {
+            "name": "mubbi/laravel-flysystem-huawei-obs",
+            "version": "1.2.11",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mubbi/laravel-flysystem-huawei-obs.git",
+                "reference": "310be9fecac8240ab269e8bcd5307226b5224c2e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mubbi/laravel-flysystem-huawei-obs/zipball/310be9fecac8240ab269e8bcd5307226b5224c2e",
+                "reference": "310be9fecac8240ab269e8bcd5307226b5224c2e",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^6.3.0|^7.0|^8.0",
+                "laravel/framework": "^9.0|^10.48.29|^11.0|^12.0",
+                "league/flysystem": "^2.0|^3.0",
+                "mubbi/esdk-obs-php": "^3.24",
+                "php": "^8.1"
+            },
+            "conflict": {
+                "guzzlehttp/guzzle": "<6.3.0|>=9.0",
+                "league/flysystem": "<2.0|>=4.0"
+            },
+            "provide": {
+                "league/flysystem-adapter": "self.version"
+            },
+            "require-dev": {
+                "fakerphp/faker": "^1.23",
+                "laravel/pint": "^1.0",
+                "mockery/mockery": "^1.6",
+                "orchestra/testbench": "^7.0|^8.0|^9.0|^10.0",
+                "phpstan/phpstan": "^1.10",
+                "phpstan/phpstan-mockery": "^1.1",
+                "phpstan/phpstan-phpunit": "^1.4",
+                "phpunit/phpunit": "^9.0|^10.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "LaravelFlysystemHuaweiObs\\HuaweiObsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "LaravelFlysystemHuaweiObs\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mubbasher Ahmed",
+                    "email": "hello@mubbi.me",
+                    "homepage": "https://mubbi.me"
+                }
+            ],
+            "description": "Laravel Flysystem v3 adapter for Huawei Object Storage Service (OBS) with v2 compatibility",
+            "keywords": [
+                "Flysystem",
+                "OBS",
+                "filesystem",
+                "huawei",
+                "laravel",
+                "object-storage"
+            ],
+            "support": {
+                "issues": "https://github.com/mubbi/laravel-flysystem-huawei-obs/issues",
+                "source": "https://github.com/mubbi/laravel-flysystem-huawei-obs/tree/v1.2.11"
+            },
+            "time": "2025-08-14T21:09:55+00:00"
         },
         {
             "name": "nesbot/carbon",

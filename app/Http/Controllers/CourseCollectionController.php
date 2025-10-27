@@ -31,24 +31,26 @@ class CourseCollectionController extends Controller
     public function adminIndex(CollectionIdRequest $request)
     {
         $arr = Arr::only($request->validated(), ['collectionId']);
-
         $collections = $this->publicRepository->ShowAll(CourseCollection::class, ['collection_id' => $arr['collectionId']])->get();
-        return AdminCollectionCoursesResource::collection($collections);
-        return \Pagination($collections);
+        return \SuccessData(__('public.Create'),AdminCollectionCoursesResource::collection($collections)) ;
     }
     /**
      * Store a newly created resource in storage.
      */
     public function store(CourseCollectionRequest $request)
     {
-        $arr = Arr::only($request->validated(), ['collection_id', 'coursesIds']);
-        foreach ($arr['coursesIds'] as $course) {
-            $course['collection_id'] = $arr['collection_id'];
-            $this->publicRepository->Create(CourseCollection::class, $course);
-        }
+        $arr = Arr::only($request->validated(), ['collection_id', 'course_id','price']);
+        $this->publicRepository->Create(CourseCollection::class, $arr);
         return \Success(__('public.Create'));
     }
 
+    public function update(Request $request){
+         $course=$this->publicRepository->ShowById(CourseCollection::class,$request->collectionCourseId);
+        $course->price = $request->price;
+        $course->save();
+        return \Success(__('public.Update'));
+
+    }
     /**
      * Remove the specified resource from storage.
      */

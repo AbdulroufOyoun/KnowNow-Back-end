@@ -6,14 +6,17 @@ use App\Http\Requests\Collection\CollectionIdRequest;
 use App\Http\Requests\Collection\CollectionRequest;
 use App\Http\Requests\Public\SearchRequest;
 use App\Http\Resources\Collection\CollectionAdminResource;
+use App\Http\Resources\Collection\CollectionBarrenResource;
 use App\Http\Resources\Collection\CollectionResource;
 use App\Http\Resources\Public\Search\SearchNameResource;
 use App\Models\Collection;
 use App\Models\CollectionCode;
+use App\Models\course;
+use App\Models\CourseCollection;
 use App\Models\UserCode;
 use App\Repositories\PublicRepository;
-use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Http\Request;
 
 class CollectionController extends Controller
 {
@@ -89,10 +92,45 @@ class CollectionController extends Controller
         $course = $this->publicRepository->ShowById(Collection::class, $courseArr['collectionId']);
         return \SuccessData(__('public.Show'), new  CollectionAdminResource($course));
     }
+
+    public function toggle(CollectionIdRequest $request){
+        $courseRequest = Arr::only($request->validated(), ['collectionId']);
+        $collection =$this->publicRepository->ShowById(Collection::class,$courseRequest['collectionId']);
+        $collection->is_active=!$collection->is_active;
+        $collection->save();
+        return \Success(__('public.Update'));
+
+    }
+    public function update(CollectionIdRequest $request){
+        $courseRequest = Arr::only($request->validated(), ['collectionId']);
+        $collection =$this->publicRepository->ShowById(Collection::class,$courseRequest['collectionId']);
+        $collection->name = $request->name;
+        $collection->save();
+        return \Success(__('public.Update'));
+    }
+    public function barren(Request $request){
+        $arr['collectionId'] = $request->collectionId;
+        $collectionCourse = Collection::where('id',$arr['collectionId'])->first();
+        $collectionCourses = CourseCollection::where('collection_id',$arr['collectionId'])->get();
+        $collectionsCount = CollectionCode::onlyTrashed()->where('collection_id',$arr['collectionId'])->whereBetween('deleted_at', [$request->startDate, $request->endDate])->where('is_free',0)->count();
+        foreach ($collectionCourses as  $collectionCourse) {
+            $course = course::where('id',$collectionCourse->course_id)->first();
+            $course->price = $collectionCourse->price;
+            $totalMony= $collectionCourses->sum('price');
+            $course['totalMony']=$totalMony;
+            $course['doctorBarren']=$totalMony*($course->ratio/100);
+            $collectionCourse['count']=$collectionsCount;
+            $collectionCourse['totalMony']=$collectionsCount*$collectionCourse->price;
+            $collectionCourse['doctorBarren']=($collectionsCount*$collectionCourse->price)*($course->ratio/100);
+            $collections[] = $collectionCourse;
+        }
+        return \SuccessData(__('public.Show') , CollectionBarrenResource::collection($collectionCourses));
+
+    }
     public function destroy(CollectionIdRequest $request)
     {
         $courseRequest = Arr::only($request->validated(), ['collectionId']);
-        $this->publicRepository->ActiveOrNot(Collection::class, $courseRequest['collectionId']);
+        $this->publicRepository->DeleteById(Collection::class, $courseRequest['collectionId']);
         return \Success(__('public.Delete'));
     }
 }

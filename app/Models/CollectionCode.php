@@ -18,6 +18,7 @@ class CollectionCode extends Model
     protected $fillable = [
         'collection_id',
         'code',
+        'price',
         'is_free',
         'expire_at',
         'created_by'

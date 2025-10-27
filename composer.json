@@ -15,6 +15,7 @@
         "laravel/passport": "^11.8",
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
+        "mubbi/laravel-flysystem-huawei-obs": "^1.2",
         "pbmedia/laravel-ffmpeg": "^8.7",
         "spatie/laravel-permission": "^6.16"
     },

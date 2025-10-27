@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests\Notification;
-use Illuminate\Validation\Rule;
+namespace App\Http\Requests\SpecializationCourse;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class NotificationRequest extends FormRequest
+class SpecializationCourseIdRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,9 +23,8 @@ class NotificationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required',
-            'description' => 'required',
-            'university_id' =>  'required'
+            'id' => [Rule::exists('specialization_courses', 'id'), 'required']
+
         ];
     }
 }
