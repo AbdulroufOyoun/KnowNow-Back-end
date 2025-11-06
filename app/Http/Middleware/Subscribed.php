@@ -21,8 +21,9 @@ class Subscribed
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $pdf = $request->route('pdf');
+     $courseContains = CourseContain::where('video', $playlist = $request->route('playlist'))->first();
 
+        $pdf = $request->route('pdf');
         if ($pdf) {
         $courseContains = CourseContain::where('pdf', $pdf)->first();
     }else{
@@ -30,6 +31,8 @@ class Subscribed
         $courseContains = CourseContain::where('video', $playlist)->first();
     }
 
+
+    // return $courseContains;
         // Check if course content exists
         if (!$courseContains) {
             return response()->json([
@@ -38,7 +41,6 @@ class Subscribed
                 'code' => 404,
             ], 404);
         }
-
         // If content is free, allow access
         if ($courseContains->is_free) {
             return $next($request);

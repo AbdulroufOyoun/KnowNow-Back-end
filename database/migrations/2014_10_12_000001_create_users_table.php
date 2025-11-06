@@ -18,11 +18,9 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('phone');
             $table->string('fcm_token')->nullable();
-
             $table->unsignedBigInteger('university_id')->nullable();
             $table->text('mobile_uuid')->nullable();
             $table->boolean('is_active')->default(true);
-
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();

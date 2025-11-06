@@ -5,7 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
+
 
 class CourseCode extends Model
 {
@@ -37,8 +40,27 @@ class CourseCode extends Model
     {
         return $this->belongsTo(course::class, 'course_id');
     }
-    public function User(): BelongsTo
+        public function CreatedBy(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return $this->belongsTo(user::class, 'created_by');
     }
+    public function userCode(): HasOne
+{
+    return $this->hasOne(UserCode::class, 'course_code_id');
+}
+
+    public function user(): HasOneThrough
+    {
+
+    return $this->hasOneThrough(
+        User::class,
+        UserCode::class,
+        'course_code_id', // Foreign key on UserCode
+        'id',             // Foreign key on User
+        'id',             // Local key on CourseCode
+        'user_id'         // Local key on UserCode
+    );
+}
+
+
 }

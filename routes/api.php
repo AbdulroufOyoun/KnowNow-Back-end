@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CollectionCodeController;
 use App\Http\Controllers\CollectionController;
@@ -39,6 +40,8 @@ Route::post('/signUp', [AuthController::class, 'signUp']);
 
         // University
         Route::get('/show_universities', [UniversityController::class, 'index']);
+        // Ad
+        Route::get('/show_ads', [AdController::class, 'index']);
 
 Route::group(
     ['middleware' => ['auth:api']],
@@ -91,11 +94,12 @@ Route::group(
         // Media
         Route::get('/show_media', [MediaController::class, 'index']);
 
+
         Route::group(
             ['middleware' => ['role:superAdmin|admin']],
             function () {
                 // Role
-                Route::get('/make_doctor', [AuthController::class, 'makeDoctor']);
+                Route::post('/make_doctor', [AuthController::class, 'makeDoctor']);
                 Route::get('/show_doctors', [AuthController::class, 'Doctors']);
                 Route::post('/send_notification', [NotificationController::class, 'sendBroadcastToAllUsers']);
 
@@ -133,6 +137,7 @@ Route::group(
 
                 // Course Contain
                 Route::post('/add_course_contain', [CourseContainController::class, 'store']);
+                Route::post('/add_linked_contain', [CourseContainController::class, 'storeLinked']);
                 Route::post('/update_course_contain', [CourseContainController::class, 'update']);
                 Route::delete('/delete_course_contain', [CourseContainController::class, 'destroy']);
 
@@ -180,13 +185,16 @@ Route::group(
                 // Media
                 Route::post('/update_media/{media}', [MediaController::class, 'update']);
 
+                // Ad
+                Route::delete('/delete_ad/{ad}', [AdController::class, 'destroy']);
+                Route::post('/add_ad', [AdController::class, 'store']);
             }
         );
 
             Route::group(
             ['middleware' => ['subscribed']],
             function () {
-                Route::get('/video/{playlist}', [CourseContainController::class, 'showPlaylist']);
+ Route::get('/video/{playlist}', [CourseContainController::class, 'showPlaylist']);
                 Route::get('/pdf/{pdf}', [CourseContainController::class, 'getPdf'])->name('api.pdf');
 
             }

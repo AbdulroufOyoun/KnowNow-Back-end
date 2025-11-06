@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Auth\ChangePasswordRequest;
+use App\Http\Requests\Auth\CreateDoctorRequest;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\SignUpRequest;
 use App\Http\Requests\Auth\UpdatefcmTokenRequest;
@@ -69,7 +70,6 @@ class AuthController extends Controller
         try {
             $user = $this->publicRepository->Create(User::class, $userArr);
         } catch (QueryException $e) {
-
             if ($e->errorInfo[1] == 1062) {
                 // Duplicate entry
                 return response()->json([
@@ -94,10 +94,24 @@ class AuthController extends Controller
         StudentResource::collection($users);
         return \Pagination($users);
     }
-    public function makeDoctor(UserIdRequest $request)
+    public function makeDoctor(CreateDoctorRequest $request)
     {
-        $arr = Arr::only($request->validated(), ['userId']);
-        $user = $this->publicRepository->ShowById(User::class, $arr['userId']);
+        $userArr = Arr::only($request->validated(),['email',  'name', 'phone']);
+        try {
+            $userArr['password']=123456789;
+            $user = $this->publicRepository->Create(User::class, $userArr);
+        } catch (QueryException $e) {
+            if ($e->errorInfo[1] == 1062) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'هذا البريد الالكتروني مستخدم من قبل',
+                    'code' => 409,
+                    'data' => null,
+                ], 409);
+            } else {
+                return response()->json(['error' => 'An error occurred'], 500);
+            }
+        }
         $user->assignRole('doctor');
         return \Success(__('public.Show'));
     }
@@ -148,6 +162,6 @@ class AuthController extends Controller
             throw ValidationException::withMessages([__('public.authFailed')]);
         }
         $this->publicRepository->update($model, $person->id, ['password' => $arr['new_password']]);
-         return \Success(__('public.password_update'));
+        return \Success(__('public.password_update'));
     }
 }

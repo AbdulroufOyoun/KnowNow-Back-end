@@ -44,10 +44,9 @@ class CourseContainController extends Controller
         $userCodes =  $this->publicRepository->ShowAll(UserCode::class, ['user_id' => $user->id])->get();
         if (count($userRole) > 0 && ($userRole[0] === 'superAdmin' || $userRole[0] === 'admin')) {
             $contain['is_subscribed'] = true;
-                    $courseContains = $this->publicRepository->ShowAll(CourseContain::class, $where)->get();
-
+            $courseContains = $this->publicRepository->ShowAll(CourseContain::class, $where)->get();
         } else {
-                    $courseContains = $this->publicRepository->ShowAll(CourseContain::class, $where)->where('is_active',1)->get();
+            $courseContains = $this->publicRepository->ShowAll(CourseContain::class, $where)->where('is_active', 1)->get();
             foreach ($userCodes as $userCode) {
                 if ($userCode->course_code_id) {
                     $courseCodes = CourseCode::onlyTrashed()->where('id', $userCode->course_code_id)->pluck('course_id');
@@ -83,15 +82,14 @@ class CourseContainController extends Controller
      */
     public function pdfs(Request $request)
     {
- $arr = $request->query('coursesIds');
+        $arr = $request->query('coursesIds');
 
-         $courses = CourseContain::whereIn('course_id', json_decode($arr))->get();
+        $courses = CourseContain::whereIn('course_id', json_decode($arr))->get();
         $pdfs = [];
         foreach ($courses as $course) {
-            $pdfs[]=$course->pdf;
+            $pdfs[] = $course->pdf;
         }
         return \SuccessData(__('public.Show'), $pdfs);
-
     }
 
     /**
@@ -100,12 +98,15 @@ class CourseContainController extends Controller
     public function store(CourseContainRequest $request)
     {
         $arr = Arr::only($request->validated(), ['name', 'video', 'pdf', 'course_id', 'is_free', 'is_theoretical']);
+        if (isset($arr['pdf'])) {
+            $pdfName = $arr['pdf']->getClientOriginalName();
 
-        $pdfName = $arr['pdf']->getClientOriginalName();
+            $pdfNewName = rand(9999999999, 99999999999) . $pdfName;
+            $arr['pdf']->storeAs('pdfFiles', $pdfNewName, 'pdf');
+            $arr['pdf'] = $pdfNewName;
+        }
 
-        $pdfNewName = rand(9999999999, 99999999999) . $pdfName;
-        $arr['pdf']->storeAs('pdfFiles', $pdfNewName, 'pdf');
-        $arr['pdf'] = $pdfNewName;
+
         $videoName = pathinfo($arr['video']->getClientOriginalName(), PATHINFO_FILENAME);
         $newName = rand(9999999999, 99999999999) . $videoName;
         $arr['video']->storeAs('uploads', "{$newName}.mp4", 'uploads');
@@ -119,10 +120,10 @@ class CourseContainController extends Controller
             ->withRotatingEncryptionKey(function ($fileName, $contents) {
                 Storage::disk('secrets')->put("$fileName", $contents);
             })
-            ->addFormat($lowFormat, function (HLSVideoFilters $filters) {
+            ->addFormat($highFormat, function (HLSVideoFilters $filters) {
                 $filters->resize(1280, 720);
             })
-            ->addFormat($highFormat)
+            // ->addFormat($highFormat)
             ->toDisk('public')
             ->save("videos/{$newName}.m3u8");
         $arr['video'] = "{$newName}.m3u8";
@@ -133,7 +134,7 @@ class CourseContainController extends Controller
         return \Success(__('public.Create'));
     }
 
-    public function getSecretKey($key,$playlist)
+    public function getSecretKey($key, $playlist)
     {
         return Storage::disk('secrets')->download($key);
     }
@@ -162,6 +163,26 @@ class CourseContainController extends Controller
             return \Success('لست مشترك بهذه الدورة', false);
         }
     }
+    public function storeLinked(Request $request)
+    {
+        // return $arr = Arr::only($containId->validated(), ['courseContainId']);
+        $contain = $this->publicRepository->ShowById(CourseContain::class, $request->courseContainId);
+        $contain->name = $request->name;
+        $contain->is_free = $request->is_free;
+        $contain->is_theoretical = $request->is_theoretical;
+        $contain->course_id = $request->course_id;
+        $contain->is_free = 0;
+        // Convert to array
+        $data = $contain->toArray();
+
+        // Remove unwanted keys
+        unset($data['id']);
+
+        // Create new record
+        $this->publicRepository->Create(CourseContain::class, $data);
+
+        return \Success(__('public.Create'));
+    }
 
     public function getPlaylist($playlist)
     {
@@ -187,91 +208,93 @@ class CourseContainController extends Controller
     public function showPlaylist(Request $request)
     {
         $playlist = $request->route('playlist');
-            return $this->getPlaylist($playlist );
+        return $this->getPlaylist($playlist);
     }
 
-    public function toggle(CourseContainIdRequest $request){
+    public function toggle(CourseContainIdRequest $request)
+    {
         $courseRequest = Arr::only($request->validated(), ['courseContainId']);
         $courseContain = $this->publicRepository->ShowAll(CourseContain::class, ['id' => $courseRequest['courseContainId']])->first();
-        $courseContain->is_free=!$courseContain->is_free;
+        $courseContain->is_free = !$courseContain->is_free;
         $courseContain->save();
         return \Success(__('public.Update'));
     }
-        public function toggleActive(CourseContainIdRequest $request){
+    public function toggleActive(CourseContainIdRequest $request)
+    {
         $courseRequest = Arr::only($request->validated(), ['courseContainId']);
         $courseContain = $this->publicRepository->ShowAll(CourseContain::class, ['id' => $courseRequest['courseContainId']])->first();
-        $courseContain->is_active=!$courseContain->is_active;
+        $courseContain->is_active = !$courseContain->is_active;
         $courseContain->save();
         return \Success(__('public.Update'));
     }
     public function update(UpdateContainRequest $request)
-{
-    $validated = $request->validated();
-    $courseContain = $this->publicRepository->ShowAll(CourseContain::class, ['id' => $validated['courseContainId']])->first();
+    {
+        $validated = $request->validated();
+        $courseContain = $this->publicRepository->ShowAll(CourseContain::class, ['id' => $validated['courseContainId']])->first();
 
-    if (!$courseContain) {
-        return ;
-    }
-    $arr = Arr::only($validated, ['name']);
+        if (!$courseContain) {
+            return;
+        }
+        $arr = Arr::only($validated, ['name']);
 
-if (isset($validated['name'])) {
-    $courseContain->name = $arr['name'];
-    $courseContain->save();
-}
+        if (isset($validated['name'])) {
+            $courseContain->name = $arr['name'];
+            $courseContain->save();
+        }
 
-    // ✅ Handle PDF update if provided
-    if (isset($validated['pdf'])) {
-        // Delete old PDF
-        Storage::disk('pdf')->delete("pdfFiles/{$courseContain->pdf}");
+        // ✅ Handle PDF update if provided
+        if (isset($validated['pdf'])) {
+            // Delete old PDF
+            Storage::disk('pdf')->delete("pdfFiles/{$courseContain->pdf}");
 
-        $pdfName = $validated['pdf']->getClientOriginalName();
-        $pdfNewName = rand(9999999999, 99999999999) . $pdfName;
-        $validated['pdf']->storeAs('pdfFiles', $pdfNewName, 'pdf');
-        $arr['pdf'] = $pdfNewName;
-    }
+            $pdfName = $validated['pdf']->getClientOriginalName();
+            $pdfNewName = rand(9999999999, 99999999999) . $pdfName;
+            $validated['pdf']->storeAs('pdfFiles', $pdfNewName, 'pdf');
+            $arr['pdf'] = $pdfNewName;
+        }
 
-    // ✅ Handle video update if provided
-    if (isset($validated['video'])) {
-        // Delete old HLS video files
-        $baseVideoName = substr($courseContain->video, 0, -5); // remove ".m3u8"
-        $files = Storage::disk('public')->files('videos');
-        foreach ($files as $file) {
-            if (str_starts_with(basename($file), $baseVideoName)) {
-                Storage::disk('public')->delete($file);
+        // ✅ Handle video update if provided
+        if (isset($validated['video'])) {
+            // Delete old HLS video files
+            $baseVideoName = substr($courseContain->video, 0, -5); // remove ".m3u8"
+            $files = Storage::disk('public')->files('videos');
+            foreach ($files as $file) {
+                if (str_starts_with(basename($file), $baseVideoName)) {
+                    Storage::disk('public')->delete($file);
+                }
+            }
+
+            $videoName = pathinfo($validated['video']->getClientOriginalName(), PATHINFO_FILENAME);
+            $newName = rand(9999999999, 99999999999) . $videoName;
+            $validated['video']->storeAs('uploads', "{$newName}.mp4", 'uploads');
+
+            $lowFormat  = (new X264('aac'))->setKiloBitrate(360);
+            $highFormat = (new X264('aac'))->setKiloBitrate(720);
+
+            FFMpeg::fromDisk('uploads')
+                ->open("uploads/{$newName}.mp4")
+                ->exportForHLS()
+                ->withRotatingEncryptionKey(function ($fileName, $contents) {
+                    Storage::disk('secrets')->put("$fileName", $contents);
+                })
+                ->addFormat($lowFormat, function (HLSVideoFilters $filters) {
+                    $filters->resize(1280, 720);
+                })
+                ->addFormat($highFormat)
+                ->toDisk('public')
+                ->save("videos/{$newName}.m3u8");
+
+            $arr['video'] = "{$newName}.m3u8";
+
+            // Clean up temp upload
+            if (Storage::disk('uploads')->exists("uploads")) {
+                File::deleteDirectory(storage_path('uploads/uploads'));
             }
         }
 
-        $videoName = pathinfo($validated['video']->getClientOriginalName(), PATHINFO_FILENAME);
-        $newName = rand(9999999999, 99999999999) . $videoName;
-        $validated['video']->storeAs('uploads', "{$newName}.mp4", 'uploads');
-
-        $lowFormat  = (new X264('aac'))->setKiloBitrate(360);
-        $highFormat = (new X264('aac'))->setKiloBitrate(720);
-
-        FFMpeg::fromDisk('uploads')
-            ->open("uploads/{$newName}.mp4")
-            ->exportForHLS()
-            ->withRotatingEncryptionKey(function ($fileName, $contents) {
-                Storage::disk('secrets')->put("$fileName", $contents);
-            })
-            ->addFormat($lowFormat, function (HLSVideoFilters $filters) {
-                $filters->resize(1280, 720);
-            })
-            ->addFormat($highFormat)
-            ->toDisk('public')
-            ->save("videos/{$newName}.m3u8");
-
-        $arr['video'] = "{$newName}.m3u8";
-
-        // Clean up temp upload
-        if (Storage::disk('uploads')->exists("uploads")) {
-            File::deleteDirectory(storage_path('uploads/uploads'));
-        }
+        // $this->publicRepository->Update(CourseContain::class, ['id' => $validated['courseContainId']], $arr);
+        return \Success(__('public.Update'));
     }
-
-    // $this->publicRepository->Update(CourseContain::class, ['id' => $validated['courseContainId']], $arr);
-    return \Success(__('public.Update'));
-}
     /**
      * Remove the specified resource from storage.
      */

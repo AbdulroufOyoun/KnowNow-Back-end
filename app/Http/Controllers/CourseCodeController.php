@@ -53,7 +53,10 @@ class CourseCodeController extends Controller
     {
         $arr = Arr::only($request->validated(), ['course_id', 'is_free', 'expire_at']);
         $arr['created_by'] = \Auth::user()->id;
-        $arr['code'] = Str::upper(Str::random(3)) . Str::lower(Str::random(2)) . rand(0, 9);
+        // $arr['code'] = Str::upper(Str::random(3)) . Str::lower(Str::random(2)) . rand(0, 9);
+        $characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        $random = substr(str_shuffle(str_repeat($characters, 8)), 0, 8);
+        $arr['code']= $random;
         $course = $this->publicRepository->ShowById(course::class,$arr['course_id']);
         $arr['price']=$course->price;
         $this->publicRepository->Create(CourseCode::class, $arr);
@@ -68,7 +71,8 @@ class CourseCodeController extends Controller
         $perPage = \returnPerPage();
         $arr = Arr::only($request->validated(), ['courseId']);
         $where = ['created_by' => \Auth::user()->id, 'course_id' => $arr['courseId']];
-        $courses = $this->publicRepository->ShowAll(CourseCode::class, $where) ->orderByRaw('expire_at IS NULL DESC')
+        $courses = $this->publicRepository->ShowAll(CourseCode::class, $where) ->orderByRaw('expire_at IS NULL DESC')->orderBy('created_at', 'desc')
+
         ->paginate($perPage);
         CourseCodeResource::Collection($courses);
         return \Pagination($courses);

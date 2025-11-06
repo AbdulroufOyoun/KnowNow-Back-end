@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('video');
-            $table->text('pdf');
+            $table->text('pdf')->nullable();
             $table->unsignedBigInteger('course_id');
             $table->boolean('is_free');
             $table->boolean('is_active')->default(0);

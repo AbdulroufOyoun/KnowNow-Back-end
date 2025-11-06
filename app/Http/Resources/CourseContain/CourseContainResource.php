@@ -18,7 +18,7 @@ class CourseContainResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'video' => $this->video,
-            'pdf' => $this->pdf,
+            'pdf' => $this->pdf ? $this->pdf : null,
             'is_free' => $this->is_free,
         ];
     }

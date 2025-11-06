@@ -23,7 +23,7 @@ class CourseCodeResource extends JsonResource
             'code' =>  $this->code,
             'is_free' =>  $this->is_free,
             'price' =>  $this->price,
-            'created_by' => new UserResource($this->User),
+            'created_by' => new UserResource($this->CreatedBy),
             // 'course' => new CourseResource($this->Course),
             'user' => new StudentResource($this->User),
             'expire_at' => Carbon::parse($this->expire_at)->format('Y-m-d'),

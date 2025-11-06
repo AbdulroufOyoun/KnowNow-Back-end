@@ -19,7 +19,12 @@ class CollectionResource extends JsonResource
         $courses = $this->Courses;
         $oldPrice = 0;
         foreach ($courses as $course) {
-            $oldPrice += $course->price;
+            if (!$course->is_active) {
+                unset($course);
+            }
+            else {
+                $oldPrice += $course->price;
+            }
         }
         return [
             'id' => $this->id,

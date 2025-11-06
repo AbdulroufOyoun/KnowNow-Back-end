@@ -19,17 +19,7 @@ class UniversityController extends Controller
     {
         $universities = $this->publicRepository->ShowAll(university::class, ['is_active'=>1])->get();
         return \SuccessData(__('public.Show'),$universities);
-
     }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
     /**
      * Store a newly created resource in storage.
      */
