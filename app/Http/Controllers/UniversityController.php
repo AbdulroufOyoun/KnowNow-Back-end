@@ -17,8 +17,8 @@ class UniversityController extends Controller
      */
     public function index()
     {
-        $universities = $this->publicRepository->ShowAll(university::class, ['is_active'=>1])->get();
-        return \SuccessData(__('public.Show'),$universities);
+        $universities = $this->publicRepository->ShowAll(university::class, ['is_active' => 1])->get();
+        return \SuccessData(__('public.Show'), $universities);
     }
     /**
      * Store a newly created resource in storage.
@@ -59,6 +59,7 @@ class UniversityController extends Controller
      */
     public function destroy(university $university)
     {
-        //
+        $university->delete();
+        return \Success(__('public.Delete'));
     }
 }

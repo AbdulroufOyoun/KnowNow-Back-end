@@ -37,13 +37,15 @@ return [
         ],
 
         'obs' => [
-        'driver' => 'obs',
-        'access_key' => env('OBS_ACCESS_KEY'),
-        'secret_key' => env('OBS_SECRET_KEY'),
-        'bucket'     => env('OBS_BUCKET'),
-        'endpoint'   => env('OBS_ENDPOINT'),
-        'region'     => env('OBS_REGION'),
-    ],
+            'driver' => 'huawei-obs',
+
+            // Required Configuration
+            'key' => env('HUAWEI_OBS_ACCESS_KEY_ID'),
+            'secret' => env('HUAWEI_OBS_SECRET_ACCESS_KEY'),
+            'bucket' => env('HUAWEI_OBS_BUCKET'),
+            'endpoint' => env('HUAWEI_OBS_ENDPOINT'),
+            'region' => env('HUAWEI_OBS_REGION'),
+        ],
 
         'public' => [
             'driver' => 'local',

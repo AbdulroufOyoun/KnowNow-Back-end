@@ -100,22 +100,19 @@ class CourseContainController extends Controller
         $arr = Arr::only($request->validated(), ['name', 'video', 'pdf', 'course_id', 'is_free', 'is_theoretical']);
         if (isset($arr['pdf'])) {
             $pdfName = $arr['pdf']->getClientOriginalName();
-
             $pdfNewName = rand(9999999999, 99999999999) . $pdfName;
             $arr['pdf']->storeAs('pdfFiles', $pdfNewName, 'pdf');
             $arr['pdf'] = $pdfNewName;
         }
-
-
         $videoName = pathinfo($arr['video']->getClientOriginalName(), PATHINFO_FILENAME);
         $newName = rand(9999999999, 99999999999) . $videoName;
-        $arr['video']->storeAs('uploads', "{$newName}.mp4", 'uploads');
-
-        $lowFormat  = (new X264('aac'))->setKiloBitrate(360);
+        // Store the original video directly in OBS
+        $arr['video']->storeAs('videos', "{$newName}.mp4", 'obs');
         $highFormat = (new X264('aac'))->setKiloBitrate(720);
 
-        FFMpeg::fromDisk('uploads')
-            ->open("uploads/{$newName}.mp4")
+        // Export HLS to OBS disk
+        FFMpeg::fromDisk('obs')
+            ->open("videos/{$newName}.mp4")
             ->exportForHLS()
             ->withRotatingEncryptionKey(function ($fileName, $contents) {
                 Storage::disk('secrets')->put("$fileName", $contents);
@@ -124,12 +121,10 @@ class CourseContainController extends Controller
                 $filters->resize(1280, 720);
             })
             // ->addFormat($highFormat)
-            ->toDisk('public')
+            ->toDisk('obs')
             ->save("videos/{$newName}.m3u8");
         $arr['video'] = "{$newName}.m3u8";
-        if (Storage::disk('uploads')->exists("uploads")) {
-            File::deleteDirectory(storage_path('uploads/uploads'));
-        }
+        // No need to clean up local uploads, everything is in OBS
         $this->publicRepository->Create(CourseContain::class, $arr);
         return \Success(__('public.Create'));
     }
@@ -187,7 +182,7 @@ class CourseContainController extends Controller
     public function getPlaylist($playlist)
     {
         return FFMpeg::dynamicHLSPlaylist()
-            ->fromDisk('public')
+            ->fromDisk('obs')
             ->open("videos/{$playlist}")
             ->setKeyUrlResolver(function ($key) use ($playlist) {
                 return route('web.video.key', [
@@ -196,7 +191,7 @@ class CourseContainController extends Controller
                 ]);
             })
             ->setMediaUrlResolver(function ($mediaFilename) use ($playlist) {
-                return Storage::disk('public')->url("videos/{$mediaFilename}");
+                return Storage::disk('obs')->url("videos/{$mediaFilename}");
             })
             ->setPlaylistUrlResolver(function ($playlistFilename) use ($playlist) {
                 return route('web.video.playlist', [
@@ -268,22 +263,20 @@ class CourseContainController extends Controller
             $newName = rand(9999999999, 99999999999) . $videoName;
             $validated['video']->storeAs('uploads', "{$newName}.mp4", 'uploads');
 
-            $lowFormat  = (new X264('aac'))->setKiloBitrate(360);
             $highFormat = (new X264('aac'))->setKiloBitrate(720);
 
-            FFMpeg::fromDisk('uploads')
-                ->open("uploads/{$newName}.mp4")
+            FFMpeg::fromDisk('obs')
+                ->open("videos/{$newName}.mp4")
                 ->exportForHLS()
                 ->withRotatingEncryptionKey(function ($fileName, $contents) {
                     Storage::disk('secrets')->put("$fileName", $contents);
                 })
-                ->addFormat($lowFormat, function (HLSVideoFilters $filters) {
+                ->addFormat($highFormat, function (HLSVideoFilters $filters) {
                     $filters->resize(1280, 720);
                 })
-                ->addFormat($highFormat)
-                ->toDisk('public')
+                // ->addFormat($highFormat)
+                ->toDisk('obs')
                 ->save("videos/{$newName}.m3u8");
-
             $arr['video'] = "{$newName}.m3u8";
 
             // Clean up temp upload
@@ -307,7 +300,7 @@ class CourseContainController extends Controller
         foreach ($files as $file) {
             // Check if the file starts with $baseVideoName
             if (str_starts_with(basename($file), $baseVideoName)) {
-                Storage::disk('public')->delete($file); // Delete the file
+                Storage::disk('obs')->delete($file); // Delete the file
             }
         }
         Storage::disk('pdf')->delete("pdfFiles/{$courseContain->pdf}"); // Delete the file

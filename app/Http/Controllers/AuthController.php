@@ -96,9 +96,9 @@ class AuthController extends Controller
     }
     public function makeDoctor(CreateDoctorRequest $request)
     {
-        $userArr = Arr::only($request->validated(),['email',  'name', 'phone']);
+        $userArr = Arr::only($request->validated(), ['email',  'name', 'phone']);
         try {
-            $userArr['password']=123456789;
+            $userArr['password'] = 123456789;
             $user = $this->publicRepository->Create(User::class, $userArr);
         } catch (QueryException $e) {
             if ($e->errorInfo[1] == 1062) {

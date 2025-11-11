@@ -38,17 +38,17 @@ use Illuminate\Support\Facades\Route;
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/signUp', [AuthController::class, 'signUp']);
 
-        // University
-        Route::get('/show_universities', [UniversityController::class, 'index']);
-        // Ad
-        Route::get('/show_ads', [AdController::class, 'index']);
+// University
+Route::get('/show_universities', [UniversityController::class, 'index']);
+// Ad
+Route::get('/show_ads', [AdController::class, 'index']);
 
 Route::group(
     ['middleware' => ['auth:api']],
     function () {
 
 
-                // Specialization
+        // Specialization
         Route::get('/show_specializations', [SpecializationController::class, 'index']);
         Route::get('/show_year_courses', [SpecializationCourseController::class, 'index']);
         Route::get('/show_specialization_years', [SpecializationCourseController::class, 'index']);
@@ -105,6 +105,7 @@ Route::group(
 
                 // University
                 Route::post('/add_university', [UniversityController::class, 'store']);
+                Route::delete('/delete_university/{university}', [UniversityController::class, 'destroy']);
 
                 //Specialization
                 Route::get('/show_admin_specialization', [SpecializationCourseController::class, 'adminIndex']);
@@ -191,12 +192,12 @@ Route::group(
             }
         );
 
-            Route::group(
+        Route::group(
             ['middleware' => ['subscribed']],
             function () {
- Route::get('/video/{playlist}', [CourseContainController::class, 'showPlaylist']);
-                Route::get('/pdf/{pdf}', [CourseContainController::class, 'getPdf'])->name('api.pdf');
+                Route::get('/video/{playlist}', [CourseContainController::class, 'showPlaylist']);
 
+                Route::get('/pdf/{pdf}', [CourseContainController::class, 'getPdf'])->name('api.pdf');
             }
         );
 
@@ -206,7 +207,6 @@ Route::group(
 
 
         Route::post('/change_password', [AuthController::class, 'SelfChangePassword']);
-
     }
 
 
