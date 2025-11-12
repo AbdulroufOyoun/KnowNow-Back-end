@@ -14,6 +14,7 @@ class AdminsSeeder extends Seeder
     public function run(): void
     {
         $user = User::create(['name' => 'superAdmin', 'phone' => '0988292807', 'mobile_uuid' => '0', 'email' => 'superAdmin@gmail.com', 'password' => '123456789']);
+        $user3 = User::create(['name' => 'Abdulrouf Oyoun', 'phone' => '0988929807', 'mobile_uuid' => '3', 'email' => 'abd@gmail.com', 'password' => '123456789']);
         $user1 = User::create(['name' => 'Molham Abood', 'phone' => '0945734346', 'mobile_uuid' => '1', 'email' => 'molham@gmail.com', 'password' => '123456789']);
         $user2 = User::create(['name' => 'Waseem Zabadna', 'phone' => '0958586969', 'mobile_uuid' => '2', 'email' => 'waseem@gmail.com', 'password' => '123456789']);
 
@@ -25,6 +26,7 @@ class AdminsSeeder extends Seeder
         $user->assignRole('superAdmin');
         $user1->assignRole('admin');
         $user2->assignRole('admin');
+        $user3->assignRole('admin');
 
 
         // Artisan::call('passport:install');

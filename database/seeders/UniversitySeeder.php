@@ -15,9 +15,11 @@ class UniversitySeeder extends Seeder
     {
         university::create(['name' => 'جامعة الرشيد']);
         university::create(['name' => 'جامعة اليرموك']);
+        university::create(['name' => 'iust']);
+        university::create(['name' => 'aiu']);
 
-        Media::created(['name'=>'instagram','url'=>'d']);
-        Media::created(['name'=>'telegram','url'=>'d']);
-        Media::created(['name'=>'whatsapp','url'=>'d']);
+        Media::created(['name' => 'instagram', 'url' => 'd']);
+        Media::created(['name' => 'telegram', 'url' => 'd']);
+        Media::created(['name' => 'whatsapp', 'url' => 'd']);
     }
 }
