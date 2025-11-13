@@ -11,6 +11,7 @@ use App\Http\Requests\Auth\UserIdRequest;
 use App\Http\Requests\Notification\UpdatefcmtokenRequest as NotificationUpdatefcmtokenRequest;
 use App\Http\Requests\User\UpdatefcmTokenRequest as UserUpdatefcmTokenRequest;
 use App\Http\Resources\Auth\LoginResource;
+use App\Http\Resources\User\DoctorResource;
 use App\Http\Resources\User\StudentResource;
 use App\Repositories\PublicRepository;
 
@@ -91,7 +92,7 @@ class AuthController extends Controller
     {
         $perPage = \returnPerPage();
         $users = User::role('doctor')->paginate($perPage);
-        StudentResource::collection($users);
+        DoctorResource::collection($users);
         return \Pagination($users);
     }
     public function makeDoctor(CreateDoctorRequest $request)
