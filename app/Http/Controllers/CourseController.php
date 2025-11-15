@@ -10,7 +10,7 @@ use App\Http\Resources\Course\CourseResource;
 use App\Http\Resources\Course\SearchCourseResource;
 use App\Http\Resources\Public\Search\SearchNameResource;
 use App\Models\CollectionCode;
-use App\Models\course;
+use App\Models\Course;
 use App\Models\CourseCode;
 use App\Models\CourseCollection;
 use App\Models\CourseContain;
@@ -32,14 +32,14 @@ class CourseController extends Controller
     public function index()
     {
         $perPage = \returnPerPage();
-        $courses = $this->publicRepository->ShowAll(course::class, ['is_active' => 1])->paginate($perPage);
+        $courses = $this->publicRepository->ShowAll(Course::class, ['is_active' => 1])->paginate($perPage);
         CourseResource::Collection($courses);
         return \Pagination($courses);
     }
     public function adminIndex()
     {
         $perPage = \returnPerPage();
-        $courses = $this->publicRepository->ShowAll(course::class, [])->paginate($perPage);
+        $courses = $this->publicRepository->ShowAll(Course::class, [])->paginate($perPage);
         CourseAdminsResource::Collection($courses);
         return \Pagination($courses);
     }
@@ -74,7 +74,7 @@ class CourseController extends Controller
             }
         }
 
-        $courses = course::whereIn('id', $userCoursesIds)->get();
+        $courses = Course::whereIn('id', $userCoursesIds)->get();
         $coursesData = []; // Create a separate array to store modified course data
 
         foreach ($courses as $course) {
@@ -110,7 +110,7 @@ class CourseController extends Controller
         $path = 'Images/Courses/';
         $arr['poster'] = \uploadImage($arr['poster'], $path);
 
-        $course =$this->publicRepository->Create(course::class, $arr);
+        $course =$this->publicRepository->Create(Course::class, $arr);
         $specialization['course_id'] = $course->id;
         $this->publicRepository->Create(SpecializationCourse::class, $specialization);
 
@@ -120,14 +120,14 @@ class CourseController extends Controller
     public function search(SearchRequest $request)
     {
         $searchArr = Arr::only($request->validated(), ['name']);
-        $cities = course::where('name', 'LIKE', "%{$searchArr['name']}%")->orWhere('name', $searchArr['name'])->where('is_active', 1)->get();
+        $cities = Course::where('name', 'LIKE', "%{$searchArr['name']}%")->orWhere('name', $searchArr['name'])->where('is_active', 1)->get();
         return \SuccessData(__('public.Show'), CourseResource::collection($cities));
     }
 
     public function find(CourseIdRequest $request)
     {
         $courseArr = Arr::only($request->validated(), ['courseId']);
-        $course = $this->publicRepository->ShowAll(course::class, ['id' => $courseArr['courseId'], 'is_active' => 1])->first();
+        $course = $this->publicRepository->ShowAll(Course::class, ['id' => $courseArr['courseId'], 'is_active' => 1])->first();
         if (!$course) {
             return \SuccessData(__('public.Show'), $course);
         }
@@ -137,21 +137,21 @@ class CourseController extends Controller
     public function adminSearch(SearchRequest $request)
     {
         $searchArr = Arr::only($request->validated(), ['name']);
-        $cities = course::where('name', 'LIKE', "%{$searchArr['name']}%")->orWhere('name', $searchArr['name'])->get();
+        $cities = Course::where('name', 'LIKE', "%{$searchArr['name']}%")->orWhere('name', $searchArr['name'])->get();
         return \SuccessData(__('public.Show'), SearchNameResource::collection($cities));
     }
 
     public function adminFind(CourseIdRequest $request)
     {
         $courseArr = Arr::only($request->validated(), ['courseId']);
-        $course = $this->publicRepository->ShowById(course::class, $courseArr['courseId']);
+        $course = $this->publicRepository->ShowById(Course::class, $courseArr['courseId']);
         return \SuccessData(__('public.Show'), new  CourseResource($course));
     }
 
         public function toggleStatus(CourseIdRequest $request)
     {
         $courseArr = Arr::only($request->validated(), ['courseId']);
-        $course = $this->publicRepository->ShowById(course::class, $courseArr['courseId']);
+        $course = $this->publicRepository->ShowById(Course::class, $courseArr['courseId']);
         $course->is_active = !$course->is_active;
         $course->save();
         return \Success(__('public.Show'));
@@ -159,7 +159,7 @@ class CourseController extends Controller
 
     public function Update(Request $request)
     {
-        $course = $this->publicRepository->ShowById(course::class, $request->courseId);
+        $course = $this->publicRepository->ShowById(Course::class, $request->courseId);
         $course->is_active = !$course->is_active;
         $course->save();
         return \Success(__('public.Show'));
@@ -170,7 +170,7 @@ class CourseController extends Controller
     public function destroy(CourseIdRequest $request)
     {
         $courseRequest = Arr::only($request->validated(), ['courseId']);
-        $this->publicRepository->ActiveOrNot(course::class, $courseRequest['courseId']);
+        $this->publicRepository->ActiveOrNot(Course::class, $courseRequest['courseId']);
         return \Success(__('public.Delete'));
     }
 }

@@ -11,7 +11,7 @@ use App\Http\Resources\Collection\CollectionResource;
 use App\Http\Resources\Public\Search\SearchNameResource;
 use App\Models\Collection;
 use App\Models\CollectionCode;
-use App\Models\course;
+use App\Models\Course;
 use App\Models\CourseCollection;
 use App\Models\UserCode;
 use App\Repositories\PublicRepository;
@@ -114,7 +114,7 @@ class CollectionController extends Controller
         $collectionCourses = CourseCollection::where('collection_id',$arr['collectionId'])->get();
         $collectionsCount = CollectionCode::onlyTrashed()->where('collection_id',$arr['collectionId'])->whereBetween('deleted_at', [$request->startDate, $request->endDate])->where('is_free',0)->count();
         foreach ($collectionCourses as  $collectionCourse) {
-            $course = course::where('id',$collectionCourse->course_id)->first();
+            $course = Course::where('id',$collectionCourse->course_id)->first();
             $course->price = $collectionCourse->price;
             $totalMony= $collectionCourses->sum('price');
             $course['totalMony']=$totalMony;

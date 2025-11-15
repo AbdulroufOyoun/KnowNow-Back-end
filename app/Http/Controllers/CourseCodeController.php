@@ -9,7 +9,7 @@ use App\Http\Resources\Course\CourseBarrenResource;
 use App\Http\Resources\CourseCode\CourseCodeResource;
 use App\Models\Collection;
 use App\Models\CollectionCode;
-use App\Models\course;
+use App\Models\Course;
 use App\Models\CourseCode;
 use App\Models\CourseCollection;
 use App\Repositories\PublicRepository;
@@ -57,7 +57,7 @@ class CourseCodeController extends Controller
         $characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         $random = substr(str_shuffle(str_repeat($characters, 8)), 0, 8);
         $arr['code']= $random;
-        $course = $this->publicRepository->ShowById(course::class,$arr['course_id']);
+        $course = $this->publicRepository->ShowById(Course::class,$arr['course_id']);
         $arr['price']=$course->price;
         $this->publicRepository->Create(CourseCode::class, $arr);
         return \Success(__('public.Create'));
@@ -83,13 +83,13 @@ class CourseCodeController extends Controller
         $barren['count']= $results->count();
         $totalMony= $results->sum('price');
         $barren['totalMony']=$totalMony;
-        $doctorRatio= course::where('id',$request->course_id)->pluck('ratio')[0];
+        $doctorRatio= Course::where('id',$request->course_id)->pluck('ratio')[0];
         $barren['doctorBarren']=$totalMony*($doctorRatio/100);
         return \SuccessData(__('public.Delete'),$barren);
     }
 
     public function doctorBarren(Request $request){
-        $courses = $this->publicRepository->ShowAll(course::class, ['doctor_id'=>$request->doctorId])->get();
+        $courses = $this->publicRepository->ShowAll(Course::class, ['doctor_id'=>$request->doctorId])->get();
         $collection=[];
         foreach ($courses as $key => $course) {
             $results = CourseCode::onlyTrashed()->where('course_id',$course->id)->where('is_free',0)->whereBetween('deleted_at', [$request->startDate, $request->endDate])->get();

@@ -8,7 +8,6 @@ use App\Http\Requests\courseCollection\CourseCollectionRequest;
 use App\Http\Resources\CollectionCourses\AdminCollectionCoursesResource;
 use App\Http\Resources\CollectionCourses\CollectionCoursesResource;
 use App\Models\Collection;
-use App\Models\course;
 use App\Models\CourseCollection;
 use App\Repositories\PublicRepository;
 use Illuminate\Http\Request;

@@ -7,7 +7,7 @@ use App\Http\Requests\CourseContain\CourseContainIdRequest;
 use App\Http\Requests\CourseContain\CourseContainRequest;
 use App\Http\Requests\CourseContain\UpdateContainRequest;
 use App\Models\CollectionCode;
-use App\Models\course;
+use App\Models\Course;
 use App\Models\CourseCode;
 use App\Models\CourseCollection;
 use App\Models\CourseContain;
@@ -31,7 +31,7 @@ class CourseContainController extends Controller
     public function index(CourseIdRequest $request)
     {
         $arr = Arr::only($request->validated(), ['courseId']);
-        $course = $this->publicRepository->ShowAll(course::class, ['id' => $arr['courseId']])->first();
+        $course = $this->publicRepository->ShowAll(Course::class, ['id' => $arr['courseId']])->first();
         if ($course->is_active == false &&  count(\Auth::user()->getRoleNames()) == 0) {
             return \Success('No thing to see here.');
         }
