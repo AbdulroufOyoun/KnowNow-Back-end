@@ -3,9 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Notification\NotificationRequest;
-use App\Http\Requests\User\NotificationRequest as UserNotificationRequest;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Kreait\Firebase\Factory;
 use Kreait\Firebase\Messaging\CloudMessage;
@@ -34,16 +32,15 @@ class NotificationController extends Controller
                 'sound' => 'default',
                 'channel_id' => 'default',
             ],
+            'priority' => 'high',
             ]);
             try {
                 $messaging->send($message);
             } catch (\Throwable $e) {
-                return response()->json([
-                    'error' => true,
-                    'message' => $e->getMessage(),
-                    // 'code' => $e->getCode(),
-                    //'trace' => $e->getTrace(),
-                ], 500);
+                \Log::warning('Failed to send notification', [
+                    'token' => substr($token, 0, 20) . '...',
+                    'error' => $e->getMessage()
+                ]);
             }
         }
         return response()->json(['message' => 'Broadcast sent to all users']);
