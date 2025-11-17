@@ -44,7 +44,7 @@ class course extends Model
     }
     public function University(): BelongsTo
     {
-        return $this->belongsTo(university::class, 'university_id');
+        return $this->belongsTo(University::class, 'university_id');
     }
         public function Year(): HasOne
     {

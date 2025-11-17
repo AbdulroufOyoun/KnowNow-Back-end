@@ -13,10 +13,10 @@ class UniversitySeeder extends Seeder
      */
     public function run(): void
     {
-        university::create(['name' => 'جامعة الرشيد']);
-        university::create(['name' => 'جامعة اليرموك']);
-        university::create(['name' => 'iust']);
-        university::create(['name' => 'aiu']);
+        University::create(['name' => 'جامعة الرشيد']);
+        University::create(['name' => 'جامعة اليرموك']);
+        University::create(['name' => 'iust']);
+        University::create(['name' => 'aiu']);
 
         Media::created(['name' => 'instagram', 'url' => 'd']);
         Media::created(['name' => 'telegram', 'url' => 'd']);

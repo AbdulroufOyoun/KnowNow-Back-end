@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\University\UniversityRequest;
-use App\Models\university;
+use App\Models\University;
 use App\Repositories\PublicRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -17,7 +17,7 @@ class UniversityController extends Controller
      */
     public function index()
     {
-        $universities = $this->publicRepository->ShowAll(university::class, ['is_active' => 1])->get();
+        $universities = $this->publicRepository->ShowAll(University::class, ['is_active' => 1])->get();
         return \SuccessData(__('public.Show'), $universities);
     }
     /**
@@ -26,7 +26,7 @@ class UniversityController extends Controller
     public function store(UniversityRequest $request)
     {
         $arr = Arr::only($request->validated(), ['name']);
-        $this->publicRepository->Create(university::class, $arr);
+        $this->publicRepository->Create(University::class, $arr);
         return \Success(__('public.Create'));
     }
 
@@ -57,7 +57,7 @@ class UniversityController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(university $university)
+    public function destroy(University $university)
     {
         $university->delete();
         return \Success(__('public.Delete'));
