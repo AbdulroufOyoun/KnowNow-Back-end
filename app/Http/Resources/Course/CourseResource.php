@@ -15,15 +15,20 @@ class CourseResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return [
-            'id' => $this->id,
-            'image' => URL::to('Images/Courses', $this->poster),
-            'name' => $this->name,
-            'description' => $this->description,
-            'price' => $this->price,
-            'ratio' => $this->ratio,
-            'doctor' => $this->Doctor->name,
-            'university' => $this->University->name,
-        ];
+        if ($this->is_active) {
+            return [
+                'id' => $this->id,
+                'image' => URL::to('Images/Courses', $this->poster),
+                'name' => $this->name,
+                'description' => $this->description,
+                'price' => $this->price,
+                'ratio' => $this->ratio,
+                'doctor' => $this->Doctor->name,
+                'university' => $this->University->name,
+            ];
+        }
+        else {
+            return null;
+        }
     }
 }
