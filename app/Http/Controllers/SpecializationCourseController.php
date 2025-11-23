@@ -28,6 +28,7 @@ class SpecializationCourseController extends Controller
         $arr = Arr::only($request->validated(), ['year','chapter','specialization_id']);
         $courses = SpecializationCourse::where(['year'=>$arr['year'],'chapter'=>$arr['chapter'],'specialization_id'=>$arr['specialization_id']])
             ->with('Course')
+            ->where('is_active', 1)
             ->get()
             ->pluck('Course');
         return \SuccessData(__('public.Show'), CourseResource::collection($courses) );
