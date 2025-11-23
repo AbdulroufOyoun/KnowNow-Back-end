@@ -49,18 +49,15 @@ Route::group(
     ['middleware' => ['auth:api']],
     function () {
 
-
         // Specialization
         Route::get('/show_specializations', [SpecializationController::class, 'index']);
         Route::get('/show_year_courses', [SpecializationCourseController::class, 'index']);
         Route::get('/show_specialization_years', [SpecializationCourseController::class, 'index']);
         Route::get('/show_years', [SpecializationCourseController::class, 'year']);
 
-
         // Course
         Route::get('/show_courses', [CourseController::class, 'index']);
         Route::get('/show_user_courses', [CourseController::class, 'userCourses']);
-
         Route::get('/search_course', [CourseController::class, 'search']);
         Route::get('/find_course', [CourseController::class, 'find']);
 
@@ -75,7 +72,6 @@ Route::group(
         Route::get('/show_courses_pdf', [CourseContainController::class, 'pdfs']);
         Route::get('/toggle_contain', [CourseContainController::class, 'toggle']);
         Route::get('/toggle_contain_activity', [CourseContainController::class, 'toggleActive']);
-
 
         // Course Comments
         Route::get('/show_course_comments', [CourseCommentController::class, 'index']);
@@ -92,8 +88,6 @@ Route::group(
 
         // User Codes
         Route::post('/add_user_code', [UserCodeController::class, 'store']);
-
-
 
         Route::group(
             ['middleware' => ['role:superAdmin|admin']],
@@ -115,7 +109,6 @@ Route::group(
                 Route::get('/show_allowed_specializations', [SpecializationCourseController::class, 'show']);
                 Route::post('/add_specialization_courses', [SpecializationCourseController::class, 'store']);
                 Route::post('/delete_specialization_course', [SpecializationCourseController::class, 'destroy']);
-
                 Route::post('/update_specialization_courses', [SpecializationCourseController::class, 'update']);
 
                 // Course
@@ -160,7 +153,6 @@ Route::group(
                 Route::get('/search_admin_collection', [CollectionController::class, 'adminSearch']);
                 Route::get('/find_admin_collection', [CollectionController::class, 'adminFind']);
                 Route::post('/show_collection_barren', [CollectionController::class, 'barren']);
-
                 Route::post('/add_collection', [CollectionController::class, 'store']);
                 Route::post('/update_collection', [CollectionController::class, 'update']);
                 Route::get('/toggle_collection', [CollectionController::class, 'toggle']);
@@ -196,7 +188,6 @@ Route::group(
             ['middleware' => ['subscribed']],
             function () {
                 Route::get('/video/{playlist}', [CourseContainController::class, 'showPlaylist']);
-
                 Route::get('/pdf/{pdf}', [CourseContainController::class, 'getPdf'])->name('api.pdf');
             }
         );
@@ -204,8 +195,6 @@ Route::group(
         // Auth
         Route::delete('/logout', [AuthController::class, 'logout']);
         Route::post('/update_token', [AuthController::class, 'UpdateToken']);
-
-
         Route::post('/change_password', [AuthController::class, 'SelfChangePassword']);
     }
 

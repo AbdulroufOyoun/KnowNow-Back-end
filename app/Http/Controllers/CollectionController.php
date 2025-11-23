@@ -105,6 +105,7 @@ class CollectionController extends Controller
         $courseRequest = Arr::only($request->validated(), ['collectionId']);
         $collection =$this->publicRepository->ShowById(Collection::class,$courseRequest['collectionId']);
         $collection->name = $request->name;
+        $collection->price = $request->price;
         $collection->save();
         return \Success(__('public.Update'));
     }
