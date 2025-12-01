@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Media;
-use App\Models\university;
+use App\Models\University;
 use Illuminate\Database\Seeder;
 
 class UniversitySeeder extends Seeder
