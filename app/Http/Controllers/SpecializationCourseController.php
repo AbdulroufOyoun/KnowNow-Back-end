@@ -23,45 +23,51 @@ class SpecializationCourseController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(ShowSpecializationRequest $request )
+    public function index(ShowSpecializationRequest $request)
     {
-        $arr = Arr::only($request->validated(), ['year','chapter','specialization_id']);
-        $courses = SpecializationCourse::where(['year'=>$arr['year'],'chapter'=>$arr['chapter'],'specialization_id'=>$arr['specialization_id']])
+        $arr = Arr::only($request->validated(), ['year', 'chapter', 'specialization_id']);
+        $courses = SpecializationCourse::where(['year' => $arr['year'], 'chapter' => $arr['chapter'], 'specialization_id' => $arr['specialization_id']])
             ->with('Course')
             ->get()
             ->pluck('Course');
-        return \SuccessData(__('public.Show'), CourseResource::collection($courses) );
+        foreach ($courses as $key => $course) {
+            if (!$course->is_active) {
+                unset($courses[$key]);
+            }
+        }
+        return \SuccessData(__('public.Show'), CourseResource::collection($courses));
     }
-        public function indexSpecializationCourses(SpecializationIdRequest $request )
+    public function indexSpecializationCourses(SpecializationIdRequest $request)
     {
         $arr = Arr::only($request->validated(), ['specialization_id']);
 
-        $courses = SpecializationCourse::where(['specialization_id'=>$arr['specialization_id']])
+        $courses = SpecializationCourse::where(['specialization_id' => $arr['specialization_id']])
             ->with('Course')
             ->get()
             ->pluck('Course');
-        return \SuccessData(__('public.Show'), CourseResource::collection($courses) );
+        return \SuccessData(__('public.Show'), CourseResource::collection($courses));
     }
-        public function year(SpecializationIdRequest $request ){
-            $arr = Arr::only($request->validated(), ['specialization_id']);
-            $years = SpecializationCourse::where('specialization_id', $arr['specialization_id'])
+    public function year(SpecializationIdRequest $request)
+    {
+        $arr = Arr::only($request->validated(), ['specialization_id']);
+        $years = SpecializationCourse::where('specialization_id', $arr['specialization_id'])
             ->select('year')
             ->distinct()
             ->get()
             ->map(function ($item) {
                 return ['year' => $item->year];
             });
-          return \SuccessData(__('public.Show'), $years );
+        return \SuccessData(__('public.Show'), $years);
     }
-        public function indexCourseSpecializations(CourseIdRequest $request )
+    public function indexCourseSpecializations(CourseIdRequest $request)
     {
         $arr = Arr::only($request->validated(), ['courseId']);
 
-        $courses = SpecializationCourse::where(['course_id'=>$arr['courseId']])
+        $courses = SpecializationCourse::where(['course_id' => $arr['courseId']])
             ->with('Specialization')
             ->get()
             ->pluck('Specialization');
-        return \SuccessData(__('public.Show'), $courses );
+        return \SuccessData(__('public.Show'), $courses);
     }
 
 
@@ -78,11 +84,11 @@ class SpecializationCourseController extends Controller
      */
     public function store(SpecializationCourseRequest $request)
     {
-        $arr = Arr::only($request->validated(), ['course_id','specialization_id','year','chapter']);
+        $arr = Arr::only($request->validated(), ['course_id', 'specialization_id', 'year', 'chapter']);
 
         $this->publicRepository->Create(SpecializationCourse::class, $arr);
 
-        return \Success(__('public.Create') );
+        return \Success(__('public.Create'));
     }
 
     /**
@@ -90,15 +96,15 @@ class SpecializationCourseController extends Controller
      */
     public function show(CourseIdRequest $request)
     {
-                $arr = Arr::only($request->validated(), ['courseId']);
-        $courses = SpecializationCourse::where(['course_id'=>$arr['courseId']])
+        $arr = Arr::only($request->validated(), ['courseId']);
+        $courses = SpecializationCourse::where(['course_id' => $arr['courseId']])
             ->with('Specialization')
             ->get()->pluck('Specialization');
 
-            $ids=$courses->pluck('id');
-                $allSpecialization = Specialization::where('university_id',$courses[0]->university_id)->whereNotIn('id',$ids)->get();
+        $ids = $courses->pluck('id');
+        $allSpecialization = Specialization::where('university_id', $courses[0]->university_id)->whereNotIn('id', $ids)->get();
 
-        return \SuccessData(__('public.Show'), $allSpecialization );
+        return \SuccessData(__('public.Show'), $allSpecialization);
     }
 
     /**
@@ -122,7 +128,7 @@ class SpecializationCourseController extends Controller
      */
     public function destroy(Request $request)
     {
-        $ads = $this->publicRepository->ShowAll(SpecializationCourse::class, ['course_id'=>$request->course_id,'specialization_id'=>$request->specialization_id])->first();
+        $ads = $this->publicRepository->ShowAll(SpecializationCourse::class, ['course_id' => $request->course_id, 'specialization_id' => $request->specialization_id])->first();
         $ads->delete();
         return \Success(__('public.Delete'));
     }

@@ -13,19 +13,17 @@ class CourseResource extends JsonResource
      *
      * @return array<string, mixed>
      */
-    public function toArray(Request $request)
+    public function toArray(Request $request): array
     {
-        if ($this->is_active) {
-            return [
-                'id' => $this->id,
-                'image' => URL::to('Images/Courses', $this->poster),
-                'name' => $this->name,
-                'description' => $this->description,
-                'price' => $this->price,
-                'ratio' => $this->ratio,
-                'doctor' => $this->Doctor->name,
-                'university' => $this->University->name,
-            ];
-        }
+        return [
+            'id' => $this->id,
+            'image' => URL::to('Images/Courses', $this->poster),
+            'name' => $this->name,
+            'description' => $this->description,
+            'price' => $this->price,
+            'ratio' => $this->ratio,
+            'doctor' => $this->Doctor->name,
+            'university' => $this->University->name,
+        ];
     }
 }
