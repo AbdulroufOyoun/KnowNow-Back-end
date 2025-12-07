@@ -13,7 +13,7 @@ class CourseResource extends JsonResource
      *
      * @return array<string, mixed>
      */
-    public function toArray(Request $request): array
+    public function toArray(Request $request)
     {
         if ($this->is_active) {
             return [
@@ -26,9 +26,6 @@ class CourseResource extends JsonResource
                 'doctor' => $this->Doctor->name,
                 'university' => $this->University->name,
             ];
-        }
-        else {
-            return [null];
         }
     }
 }
