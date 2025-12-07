@@ -30,9 +30,11 @@ class SpecializationCourseController extends Controller
             ->with('Course')
             ->get()
             ->pluck('Course');
-        foreach ($courses as $key => $course) {
-            if (!$course->is_active) {
-                unset($courses[$key]);
+        if (count(\Auth::user()->getRoleNames()) > 0) {
+            foreach ($courses as $key => $course) {
+                if (!$course->is_active) {
+                    unset($courses[$key]);
+                }
             }
         }
         return \SuccessData(__('public.Show'), CourseResource::collection($courses));
