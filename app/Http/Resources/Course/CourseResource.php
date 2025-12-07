@@ -28,7 +28,7 @@ class CourseResource extends JsonResource
             ];
         }
         else {
-            return null;
+            return [null];
         }
     }
 }
