@@ -42,8 +42,8 @@ Route::post('/signUp', [AuthController::class, 'signUp']);
 Route::get('/show_universities', [UniversityController::class, 'index']);
 // Ad
 Route::get('/show_ads', [AdController::class, 'index']);
-        // Media
-        Route::get('/show_media', [MediaController::class, 'index']);
+// Media
+Route::get('/show_media', [MediaController::class, 'index']);
 
 Route::group(
     ['middleware' => ['auth:api']],

@@ -21,18 +21,21 @@ class Subscribed
      */
     public function handle(Request $request, Closure $next): Response
     {
-     $courseContains = CourseContain::where('video', $playlist = $request->route('playlist'))->first();
+        if (\Auth::check() && \Auth::user()->roles->count() > 0) {
+            return $next($request);
+        }
+        $courseContains = CourseContain::where('video', $playlist = $request->route('playlist'))->first();
 
         $pdf = $request->route('pdf');
         if ($pdf) {
-        $courseContains = CourseContain::where('pdf', $pdf)->first();
-    }else{
-        $playlist = $request->route('playlist');
-        $courseContains = CourseContain::where('video', $playlist)->first();
-    }
+            $courseContains = CourseContain::where('pdf', $pdf)->first();
+        } else {
+            $playlist = $request->route('playlist');
+            $courseContains = CourseContain::where('video', $playlist)->first();
+        }
 
 
-    // return $courseContains;
+        // return $courseContains;
         // Check if course content exists
         if (!$courseContains) {
             return response()->json([
@@ -47,7 +50,7 @@ class Subscribed
         }
 
         // Check user subscription for paid content
-        $courseCodes = CourseCode::onlyTrashed()->where('course_id', $courseContains->course_id)->where('expire_at','>',Carbon::now())->pluck('id');
+        $courseCodes = CourseCode::onlyTrashed()->where('course_id', $courseContains->course_id)->where('expire_at', '>', Carbon::now())->pluck('id');
         $courseCollections = CourseCollection::where('course_id', $courseContains->course_id)->pluck('collection_id');
         $collectionCodes = CollectionCode::onlyTrashed()->whereIn('collection_id', $courseCollections)->pluck('id');
 
@@ -57,8 +60,8 @@ class Subscribed
         })->first();
 
         if ($userCodes) {
-        return $next($request);
-              } else {
+            return $next($request);
+        } else {
             return \Success('لست مشترك بهذه الدورة', false);
         }
     }
