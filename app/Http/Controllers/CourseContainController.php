@@ -97,22 +97,62 @@ class CourseContainController extends Controller
      */
     public function store(CourseContainRequest $request)
     {
+        // $arr = Arr::only($request->validated(), ['name', 'video', 'pdf', 'course_id', 'is_free', 'is_theoretical']);
+        // if (isset($arr['pdf'])) {
+        //     $pdfName = $arr['pdf']->getClientOriginalName();
+        //     $pdfNewName = rand(9999999999, 99999999999) . $pdfName;
+        //     $arr['pdf']->storeAs('pdfFiles', $pdfNewName, 'pdf');
+        //     $arr['pdf'] = $pdfNewName;
+        // }
+        // $videoName = pathinfo($arr['video']->getClientOriginalName(), PATHINFO_FILENAME);
+        // $newName = rand(9999999999, 99999999999) . $videoName;
+        // // Store the original video directly in OBS
+        // $arr['video']->storeAs('videos', "{$newName}.mp4", 'obs');
+        // $highFormat = (new X264('aac'))->setKiloBitrate(720);
+
+        // // Export HLS to OBS disk
+        // FFMpeg::fromDisk('obs')
+        //     ->open("videos/{$newName}.mp4")
+        //     ->exportForHLS()
+        //     ->withRotatingEncryptionKey(function ($fileName, $contents) {
+        //         Storage::disk('secrets')->put("$fileName", $contents);
+        //     })
+        //     ->addFormat($highFormat, function (HLSVideoFilters $filters) {
+        //         $filters->resize(1280, 720);
+        //     })
+        //     // ->addFormat($highFormat)
+        //     ->toDisk('obs')
+        //     ->save("videos/{$newName}.m3u8");
+        // $arr['video'] = "{$newName}.m3u8";
+        // // No need to clean up local uploads, everything is in OBS
+        // $this->publicRepository->Create(CourseContain::class, $arr);
+        // return \Success(__('public.Create'));
         $arr = Arr::only($request->validated(), ['name', 'video', 'pdf', 'course_id', 'is_free', 'is_theoretical']);
+
+        // 1. التعامل مع ملف الـ PDF كما هو
         if (isset($arr['pdf'])) {
             $pdfName = $arr['pdf']->getClientOriginalName();
             $pdfNewName = rand(9999999999, 99999999999) . $pdfName;
             $arr['pdf']->storeAs('pdfFiles', $pdfNewName, 'pdf');
             $arr['pdf'] = $pdfNewName;
         }
-        $videoName = pathinfo($arr['video']->getClientOriginalName(), PATHINFO_FILENAME);
-        $newName = rand(9999999999, 99999999999) . $videoName;
-        // Store the original video directly in OBS
-        $arr['video']->storeAs('videos', "{$newName}.mp4", 'obs');
+
+        // 2. معالجة الفيديو (يدعم mp4, mov, avi, إلخ)
+        $videoFile = $request->file('video');
+        $originalExtension = $videoFile->getClientOriginalExtension(); // الحصول على الامتداد الحقيقي (mov أو mp4)
+        $videoNameOnly = pathinfo($videoFile->getClientOriginalName(), PATHINFO_FILENAME);
+        $uniqueName = rand(9999999999, 99999999999) . $videoNameOnly;
+
+        // تخزين الملف الأصلي بامتداده الحقيقي (سواء كان mov أو mp4)
+        $originalVideoPath = "videos/{$uniqueName}.{$originalExtension}";
+        $videoFile->storeAs('videos', "{$uniqueName}.{$originalExtension}", 'obs');
+
         $highFormat = (new X264('aac'))->setKiloBitrate(720);
 
-        // Export HLS to OBS disk
+        // 3. تحويل الفيديو إلى HLS
+        // FFMpeg سيفتح الملف سواء كان mov أو mp4 ويحوله إلى m3u8
         FFMpeg::fromDisk('obs')
-            ->open("videos/{$newName}.mp4")
+            ->open($originalVideoPath)
             ->exportForHLS()
             ->withRotatingEncryptionKey(function ($fileName, $contents) {
                 Storage::disk('secrets')->put("$fileName", $contents);
@@ -120,11 +160,12 @@ class CourseContainController extends Controller
             ->addFormat($highFormat, function (HLSVideoFilters $filters) {
                 $filters->resize(1280, 720);
             })
-            // ->addFormat($highFormat)
             ->toDisk('obs')
-            ->save("videos/{$newName}.m3u8");
-        $arr['video'] = "{$newName}.m3u8";
-        // No need to clean up local uploads, everything is in OBS
+            ->save("videos/{$uniqueName}.m3u8");
+
+        // حفظ رابط ملف الـ m3u8 في قاعدة البيانات
+        $arr['video'] = "{$uniqueName}.m3u8";
+
         $this->publicRepository->Create(CourseContain::class, $arr);
         return \Success(__('public.Create'));
     }
