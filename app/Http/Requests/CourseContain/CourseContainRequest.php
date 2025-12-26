@@ -25,7 +25,7 @@ class CourseContainRequest extends FormRequest
     {
         return [
             'name' => 'required',
-            'video' => 'required|file|mimes:mp4',
+            'video' => 'required|file|mimes:mp4,mov,avi,mkv',
             'pdf' => 'nullable|file|mimes:pdf',
             'course_id' => 'required',
             'is_free' => 'required',
