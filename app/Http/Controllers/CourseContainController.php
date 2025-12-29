@@ -97,56 +97,28 @@ class CourseContainController extends Controller
      */
     public function store(CourseContainRequest $request)
     {
-        $arr = Arr::only($request->validated(), ['name', 'video', 'pdf', 'course_id', 'is_free', 'is_theoretical']);
+        // استبعاد الفيديو من المصفوفة لأننا سنعالجه لاحقاً
+        $data = Arr::only($request->validated(), ['name', 'pdf', 'course_id', 'is_free', 'is_theoretical']);
 
         // 1. معالجة الـ PDF
-        if (isset($arr['pdf'])) {
-            $pdfName = $arr['pdf']->getClientOriginalName();
-            $pdfNewName = rand(9999999999, 99999999999) . $pdfName;
-            $arr['pdf']->storeAs('pdfFiles', $pdfNewName, 'pdf');
-            $arr['pdf'] = $pdfNewName;
+        if ($request->hasFile('pdf')) {
+            $pdfNewName = rand(9999999999, 99999999999) . $request->file('pdf')->getClientOriginalName();
+            $request->file('pdf')->storeAs('pdfFiles', $pdfNewName, 'pdf');
+            $data['pdf'] = $pdfNewName;
         }
 
-        // 2. معالجة الفيديو
+        // 2. رفع ملف الفيديو الأصلي كما هو بسرعة
         $videoFile = $request->file('video');
         $originalExtension = $videoFile->getClientOriginalExtension();
-        $videoNameOnly = pathinfo($videoFile->getClientOriginalName(), PATHINFO_FILENAME);
-        $uniqueName = rand(9999999999, 99999999999) . $videoNameOnly;
-
+        $uniqueName = rand(9999999999, 99999999999) . pathinfo($videoFile->getClientOriginalName(), PATHINFO_FILENAME);
         $originalVideoPath = "videos/{$uniqueName}.{$originalExtension}";
+
         $videoFile->storeAs('videos', "{$uniqueName}.{$originalExtension}", 'obs');
 
-        $highFormat = (new X264('aac'))
-            ->setKiloBitrate(720)
-            ->setAdditionalParameters([
+        // 3. إرسال المهمة للـ Queue
+        dispatch(new \App\Jobs\ProcessVideoUpload($data, $originalVideoPath, $uniqueName));
 
-                '-preset',
-                'superfast', // أسرع خيار متاح للـ CPU في نسخة 7.1
-                '-threads',
-                '0',         // إجبار FFmpeg على استخدام كل نويات المعالج المتاحة
-                '-pix_fmt',
-                'yuv420p',
-                '-movflags',
-                '+faststart',
-            ]);
-
-        // 3. تحويل الفيديو إلى HLS
-        FFMpeg::fromDisk('obs')
-            ->open($originalVideoPath)
-            ->exportForHLS()
-            ->withRotatingEncryptionKey(function ($fileName, $contents) {
-                Storage::disk('secrets')->put("$fileName", $contents);
-            })
-            ->addFormat($highFormat, function (HLSVideoFilters $filters) {
-                $filters->resize(1280, 720);
-            })
-            ->toDisk('obs')
-            ->save("videos/{$uniqueName}.m3u8");
-
-        $arr['video'] = "{$uniqueName}.m3u8";
-
-        $this->publicRepository->Create(CourseContain::class, $arr);
-        return \Success(__('public.Create'));
+        return \Success('تم استلام الفيديو، جاري معالجته في الخلفية. سيظهر للطلاب فور اكتماله.');
     }
 
     public function getSecretKey($key, $playlist)
