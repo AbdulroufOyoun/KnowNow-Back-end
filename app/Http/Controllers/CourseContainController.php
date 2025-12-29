@@ -127,8 +127,6 @@ class CourseContainController extends Controller
                 '3.1',
                 '-movflags',
                 '+faststart',
-                '-vf',
-                'eq=contrast=1.1:saturation=1.3'
             ]);
 
         // 3. تحويل الفيديو إلى HLS
