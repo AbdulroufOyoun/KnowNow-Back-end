@@ -121,17 +121,13 @@ class CourseContainController extends Controller
             ->setKiloBitrate(720)
             ->setAdditionalParameters([
                 '-pix_fmt',
-                'yuv420p',      // تحويل من 10-bit إلى 8-bit (حل مشكلة الـ Decoder)
-                '-color_primaries',
-                'bt709', // توحيد الألوان لمعيار SDR
-                '-color_trc',
-                'bt709',
-                '-colorspace',
-                'bt709',
+                'yuv420p',
                 '-profile:v',
-                'main',       // بروفايل متوافق مع كافة الأجهزة
+                'main',
                 '-level',
-                '3.1'
+                '3.1',
+                '-movflags',
+                '+faststart'
             ]);
 
         // 3. تحويل الفيديو إلى HLS
