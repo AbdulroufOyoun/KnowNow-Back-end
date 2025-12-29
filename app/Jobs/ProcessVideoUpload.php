@@ -11,6 +11,8 @@ use ProtoneMedia\LaravelFFMpeg\Support\FFMpeg;
 use FFMpeg\Format\Video\X264;
 use Illuminate\Support\Facades\Storage;
 use App\Models\CourseContain;
+use Illuminate\Support\Facades\Mail;
+use Throwable;
 
 class ProcessVideoUpload implements ShouldQueue
 {
@@ -64,5 +66,35 @@ class ProcessVideoUpload implements ShouldQueue
 
         // اختياري: حذف الفيديو الأصلي لتوفير المساحة
         Storage::disk('obs')->delete($this->originalVideoPath);
+    }
+
+    /**
+     * معالجة فشل الجوب
+     *
+     * @param  \Throwable  $exception
+     * @return void
+     */
+    public function failed(Throwable $exception)
+    {
+        $videoName = $this->uniqueName;
+        $errorMessage = $exception->getMessage();
+
+        // إرسال إيميل بسيط (يمكنك إنشاء Mailable مخصص لاحقاً)
+        Mail::raw("فشلت عملية معالجة الفيديو: {$videoName}. \n\n الخطأ هو: \n {$errorMessage}", function ($message) use ($videoName) {
+            $message->to('oyoun26@gmail.com') // ضع بريدك هنا
+                ->subject("خطأ في معالجة الفيديو: {$videoName}");
+        });
+        Mail::raw("فشلت عملية معالجة الفيديو: {$videoName}. \n\n الخطأ هو: \n {$errorMessage}", function ($message) use ($videoName) {
+            $message->to('Molhamaboud0@gmail.com') // ضع بريدك هنا
+                ->subject("خطأ في معالجة الفيديو: {$videoName}");
+        });
+        Mail::raw("فشلت عملية معالجة الفيديو: {$videoName}. \n\n الخطأ هو: \n {$errorMessage}", function ($message) use ($videoName) {
+            $message->to('wjz1823@gmail.com') // ضع بريدك هنا
+                ->subject("خطأ في معالجة الفيديو: {$videoName}");
+        });
+
+
+        // ملاحظة: يُفضل أيضاً تسجيل الخطأ في اللوج
+        \Log::error("Job Failed for video {$videoName}: " . $errorMessage);
     }
 }
