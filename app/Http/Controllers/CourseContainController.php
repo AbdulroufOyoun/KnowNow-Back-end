@@ -119,12 +119,13 @@ class CourseContainController extends Controller
         $highFormat = (new X264('aac'))
             ->setKiloBitrate(720)
             ->setAdditionalParameters([
+
+                '-preset',
+                'superfast', // أسرع خيار متاح للـ CPU في نسخة 7.1
+                '-threads',
+                '0',         // إجبار FFmpeg على استخدام كل نويات المعالج المتاحة
                 '-pix_fmt',
                 'yuv420p',
-                '-profile:v',
-                'main',
-                '-level',
-                '3.1',
                 '-movflags',
                 '+faststart',
             ]);
