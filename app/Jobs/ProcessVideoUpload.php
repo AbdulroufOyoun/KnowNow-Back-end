@@ -63,6 +63,6 @@ class ProcessVideoUpload implements ShouldQueue
         CourseContain::create($this->data);
 
         // اختياري: حذف الفيديو الأصلي لتوفير المساحة
-        // Storage::disk('obs')->delete($this->originalVideoPath);
+        Storage::disk('obs')->delete($this->originalVideoPath);
     }
 }
