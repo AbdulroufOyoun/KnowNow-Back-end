@@ -116,7 +116,6 @@ class CourseContainController extends Controller
         $originalVideoPath = "videos/{$uniqueName}.{$originalExtension}";
         $videoFile->storeAs('videos', "{$uniqueName}.{$originalExtension}", 'obs');
 
-        // الإعدادات الجديدة لضمان التوافق (إصلاح خطأ S24 Ultra)
         $highFormat = (new X264('aac'))
             ->setKiloBitrate(720)
             ->setAdditionalParameters([
@@ -127,7 +126,9 @@ class CourseContainController extends Controller
                 '-level',
                 '3.1',
                 '-movflags',
-                '+faststart'
+                '+faststart',
+                '-vf',
+                'eq=contrast=1.1:saturation=1.3'
             ]);
 
         // 3. تحويل الفيديو إلى HLS
