@@ -6,6 +6,7 @@ use App\Http\Requests\Course\CourseIdRequest;
 use App\Http\Requests\CourseContain\CourseContainIdRequest;
 use App\Http\Requests\CourseContain\CourseContainRequest;
 use App\Http\Requests\CourseContain\UpdateContainRequest;
+use App\Jobs\ProcessVideoUpload;
 use App\Models\CollectionCode;
 use App\Models\Course;
 use App\Models\CourseCode;
@@ -116,7 +117,7 @@ class CourseContainController extends Controller
         $videoFile->storeAs('videos', "{$uniqueName}.{$originalExtension}", 'obs');
 
         // 3. إرسال المهمة للـ Queue
-        dispatch(new \App\Jobs\ProcessVideoUpload($data, $originalVideoPath, $uniqueName));
+        dispatch(new ProcessVideoUpload($data, $originalVideoPath, $uniqueName));
 
         return \Success('تم استلام الفيديو، جاري معالجته في الخلفية. سيظهر للطلاب فور اكتماله.');
     }
