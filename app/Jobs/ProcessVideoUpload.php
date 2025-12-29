@@ -53,8 +53,6 @@ class ProcessVideoUpload implements ShouldQueue
                 Storage::disk('secrets')->put("$fileName", $contents);
             })
             ->addFormat($highFormat, function ($filters) {
-                // فلتر تصحيح الألوان لمنع البهتان في S24 Ultra
-                $filters->custom('eq=contrast=1.1:saturation=1.3,format=yuv420p');
                 $filters->resize(1280, 720);
             })
             ->toDisk('obs')
