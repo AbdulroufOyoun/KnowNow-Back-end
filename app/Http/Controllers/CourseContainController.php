@@ -21,6 +21,7 @@ use ProtoneMedia\LaravelFFMpeg\Exporters\HLSVideoFilters;
 use FFMpeg\Format\Video\X264;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 class CourseContainController extends Controller
 {
@@ -103,24 +104,27 @@ class CourseContainController extends Controller
 
         // 1. معالجة الـ PDF
         if ($request->hasFile('pdf')) {
-            $pdfNewName = rand(9999999999, 99999999999) . $request->file('pdf')->getClientOriginalName();
+            // تنظيف اسم الـ PDF أيضاً لضمان عدم وجود مشاكل في الروابط
+            $pdfNewName = time() . '_' . Str::random(10) . '.' . $request->file('pdf')->getClientOriginalExtension();
             $request->file('pdf')->storeAs('pdfFiles', $pdfNewName, 'pdf');
             $data['pdf'] = $pdfNewName;
         }
 
-        // 2. رفع ملف الفيديو الأصلي كما هو بسرعة
+        // 2. معالجة الفيديو (توليد اسم آمن 100% لـ FFMpeg)
         $videoFile = $request->file('video');
         $originalExtension = $videoFile->getClientOriginalExtension();
-        $uniqueName = rand(9999999999, 99999999999) . pathinfo($videoFile->getClientOriginalName(), PATHINFO_FILENAME);
+
+        // الحل الجذري: اسم يتكون من أرقام وحروف إنجليزية فقط
+        $uniqueName = time() . '_' . Str::random(12);
         $originalVideoPath = "videos/{$uniqueName}.{$originalExtension}";
 
+        // رفع الملف الأصلي بالاسم الآمن الجديد
         $videoFile->storeAs('videos', "{$uniqueName}.{$originalExtension}", 'obs');
 
         // 3. إرسال المهمة للـ Queue
         dispatch(new ProcessVideoUpload($data, $originalVideoPath, $uniqueName));
 
-        return \Success('تم استلام الفيديو، جاري معالجته في الخلفية. سيظهر للطلاب فور اكتماله.');
-        // $arr = Arr::only($request->validated(), ['name', 'video', 'pdf', 'course_id', 'is_free', 'is_theoretical']);
+        return \Success('تم استلام الفيديو، جاري معالجته في الخلفية. سيظهر للطلاب فور اكتماله.');    // $arr = Arr::only($request->validated(), ['name', 'video', 'pdf', 'course_id', 'is_free', 'is_theoretical']);
 
         // // 1. معالجة الـ PDF
         // if (isset($arr['pdf'])) {

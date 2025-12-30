@@ -20,7 +20,11 @@ class ProcessVideoUpload implements ShouldQueue
 
     // وقت التنفيذ المسموح (ساعة واحدة للفيديوهات الطويلة)
     public $timeout = 3600;
+    // عدد مرات إعادة المحاولة في حال الفشل
+    public $tries = 3;
 
+    // عدد الثواني التي يجب انتظارها قبل محاولة تنفيذ المهمة مرة أخرى
+    public $backoff = 60;
     protected $data;
     protected $originalVideoPath;
     protected $uniqueName;
