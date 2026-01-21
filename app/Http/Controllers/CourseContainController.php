@@ -187,23 +187,23 @@ class CourseContainController extends Controller
         $arr = $request->route('pdf');
 
         $courseContains = $this->publicRepository->ShowAll(CourseContain::class, ['pdf' => $arr])->first();
-        if ($courseContains->is_free) {
-            return Storage::disk('pdf')->download("pdfFiles/{$arr}");
-        }
-        $courseCodes = CourseCode::onlyTrashed()->where('course_id', $courseContains->course_id)->pluck('id');
+        // if ($courseContains->is_free) {
+        //     return Storage::disk('pdf')->download("pdfFiles/{$arr}");
+        // }
+        // $courseCodes = CourseCode::onlyTrashed()->where('course_id', $courseContains->course_id)->pluck('id');
 
-        $courseCollections =  $this->publicRepository->ShowAll(CourseCollection::class, ['course_id' => $courseContains->course_id])->pluck('collection_id');
-        $collectionCodes = CollectionCode::onlyTrashed()->whereIn('collection_id', $courseCollections)->pluck('id');
+        // $courseCollections =  $this->publicRepository->ShowAll(CourseCollection::class, ['course_id' => $courseContains->course_id])->pluck('collection_id');
+        // $collectionCodes = CollectionCode::onlyTrashed()->whereIn('collection_id', $courseCollections)->pluck('id');
 
-        $userCodes = UserCode::where('user_id', \Auth::user()->id)->where(function ($query) use ($courseCodes, $collectionCodes) {
-            $query->whereIn('course_code_id', $courseCodes)
-                ->orWhereIn('collection_code_id', $collectionCodes);
-        })->first();
-        if ($userCodes) {
-            return Storage::disk('pdf')->download("pdfFiles/{$arr}");
-        } else {
-            return \Success('لست مشترك بهذه الدورة', false);
-        }
+        // $userCodes = UserCode::where('user_id', \Auth::user()->id)->where(function ($query) use ($courseCodes, $collectionCodes) {
+        //     $query->whereIn('course_code_id', $courseCodes)
+        //         ->orWhereIn('collection_code_id', $collectionCodes);
+        // })->first();
+        // if ($userCodes) {
+        return Storage::disk('pdf')->download("pdfFiles/{$arr}");
+        // } else {
+        //     return \Success('لست مشترك بهذه الدورة', false);
+        // }
     }
     public function storeLinked(Request $request)
     {
