@@ -186,7 +186,7 @@ class CourseContainController extends Controller
         // $arr = Arr::only($request->validated(), ['pdf']);
         $arr = $request->route('pdf');
 
-        $courseContains = $this->publicRepository->ShowAll(CourseContain::class, ['pdf' => $arr])->first();
+        // $courseContains = $this->publicRepository->ShowAll(CourseContain::class, ['pdf' => $arr])->first();
         // if ($courseContains->is_free) {
         //     return Storage::disk('pdf')->download("pdfFiles/{$arr}");
         // }
