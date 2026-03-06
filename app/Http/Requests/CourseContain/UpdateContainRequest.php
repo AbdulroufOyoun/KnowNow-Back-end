@@ -25,6 +25,7 @@ class UpdateContainRequest extends FormRequest
             'courseContainId' => 'required',
 
             'name' => 'nullable',
+            'number' => 'nullable',
             'video' => 'nullable|file|mimes:mp4',
             'pdf' => 'nullable|file|mimes:pdf',
 
