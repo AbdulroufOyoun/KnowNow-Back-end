@@ -126,54 +126,6 @@ class CourseContainController extends Controller
 
         return \Success('تم استلام الفيديو، جاري معالجته في الخلفية. سيظهر للطلاب فور اكتماله.');    // $arr = Arr::only($request->validated(), ['name', 'video', 'pdf', 'course_id', 'is_free', 'is_theoretical']);
 
-        // // 1. معالجة الـ PDF
-        // if (isset($arr['pdf'])) {
-        //     $pdfName = $arr['pdf']->getClientOriginalName();
-        //     $pdfNewName = rand(9999999999, 99999999999) . $pdfName;
-        //     $arr['pdf']->storeAs('pdfFiles', $pdfNewName, 'pdf');
-        //     $arr['pdf'] = $pdfNewName;
-        // }
-
-        // // 2. معالجة الفيديو
-        // $videoFile = $request->file('video');
-        // $originalExtension = $videoFile->getClientOriginalExtension();
-        // $videoNameOnly = pathinfo($videoFile->getClientOriginalName(), PATHINFO_FILENAME);
-        // $uniqueName = rand(9999999999, 99999999999) . $videoNameOnly;
-
-        // $originalVideoPath = "videos/{$uniqueName}.{$originalExtension}";
-        // $videoFile->storeAs('videos', "{$uniqueName}.{$originalExtension}", 'obs');
-
-        // $highFormat = (new X264('aac'))
-        //     ->setKiloBitrate(720)
-        //     ->setAdditionalParameters([
-
-        //         '-preset',
-        //         'superfast', // أسرع خيار متاح للـ CPU في نسخة 7.1
-        //         '-threads',
-        //         '0',         // إجبار FFmpeg على استخدام كل نويات المعالج المتاحة
-        //         '-pix_fmt',
-        //         'yuv420p',
-        //         '-movflags',
-        //         '+faststart',
-        //     ]);
-
-        // // 3. تحويل الفيديو إلى HLS
-        // FFMpeg::fromDisk('obs')
-        //     ->open($originalVideoPath)
-        //     ->exportForHLS()
-        //     ->withRotatingEncryptionKey(function ($fileName, $contents) {
-        //         Storage::disk('secrets')->put("$fileName", $contents);
-        //     })
-        //     ->addFormat($highFormat, function (HLSVideoFilters $filters) {
-        //         $filters->resize(1280, 720);
-        //     })
-        //     ->toDisk('obs')
-        //     ->save("videos/{$uniqueName}.m3u8");
-
-        // $arr['video'] = "{$uniqueName}.m3u8";
-
-        // $this->publicRepository->Create(CourseContain::class, $arr);
-        // return \Success(__('public.Create'));
     }
 
     public function getSecretKey($key, $playlist)
@@ -342,7 +294,9 @@ class CourseContainController extends Controller
     {
         $courseRequest = Arr::only($request->validated(), ['courseContainId']);
         $courseContain = $this->publicRepository->ShowAll(CourseContain::class, ['id' => $courseRequest['courseContainId']])->first();
-        $baseVideoName = substr($courseContain->video, 0, -6); // Remove last 4 characters (e.g., '.mp4')
+        $checkLinked = CourseContain::where('video',$courseContain->video)->where('id','!=',$courseRequest['courseContainId'])->exist();
+        if(!$checkLinked){
+                    $baseVideoName = substr($courseContain->video, 0, -6); // Remove last 4 characters (e.g., '.mp4')
         $files = Storage::disk('public')->files('videos'); // Get all files in the 'videos' directory
         foreach ($files as $file) {
             // Check if the file starts with $baseVideoName
@@ -351,6 +305,8 @@ class CourseContainController extends Controller
             }
         }
         Storage::disk('pdf')->delete("pdfFiles/{$courseContain->pdf}"); // Delete the file
+        }
+
         $this->publicRepository->DeleteById(CourseContain::class, $courseRequest['courseContainId']);
         return \Success(__('public.Delete'));
     }
