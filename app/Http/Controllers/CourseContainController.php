@@ -230,10 +230,11 @@ class CourseContainController extends Controller
         if (!$courseContain) {
             return;
         }
-        $arr = Arr::only($validated, ['name']);
+        $arr = Arr::only($validated, ['name','number']);
 
         if (isset($validated['name'])) {
             $courseContain->name = $arr['name'];
+            $courseContain->number = $arr['number'];
             $courseContain->save();
         }
 
