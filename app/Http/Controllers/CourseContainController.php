@@ -46,9 +46,9 @@ class CourseContainController extends Controller
         $userCodes =  $this->publicRepository->ShowAll(UserCode::class, ['user_id' => $user->id])->get();
         if (count($userRole) > 0 && ($userRole[0] === 'superAdmin' || $userRole[0] === 'admin')) {
             $contain['is_subscribed'] = true;
-            $courseContains = $this->publicRepository->ShowAll(CourseContain::class, $where)->get();
+            $courseContains = $this->publicRepository->ShowAll(CourseContain::class, $where)->orderBy('number', 'asc')->get();
         } else {
-            $courseContains = $this->publicRepository->ShowAll(CourseContain::class, $where)->where('is_active', 1)->get();
+            $courseContains = $this->publicRepository->ShowAll(CourseContain::class, $where)->where('is_active', 1)->orderBy('number', 'asc')->get();
             foreach ($userCodes as $userCode) {
                 if ($userCode->course_code_id) {
                     $courseCodes = CourseCode::onlyTrashed()->where('id', $userCode->course_code_id)->pluck('course_id');
@@ -100,7 +100,7 @@ class CourseContainController extends Controller
     public function store(CourseContainRequest $request)
     {
         // استبعاد الفيديو من المصفوفة لأننا سنعالجه لاحقاً
-        $data = Arr::only($request->validated(), ['name', 'pdf', 'course_id', 'is_free', 'is_theoretical']);
+        $data = Arr::only($request->validated(), ['name', 'pdf', 'course_id', 'is_free', 'is_theoretical', 'number']);
 
         // 1. معالجة الـ PDF
         if ($request->hasFile('pdf')) {
@@ -165,6 +165,7 @@ class CourseContainController extends Controller
         $contain->is_free = $request->is_free;
         $contain->is_theoretical = $request->is_theoretical;
         $contain->course_id = $request->course_id;
+        $contain->number = $request->number;
         $contain->is_free = 0;
         // Convert to array
         $data = $contain->toArray();

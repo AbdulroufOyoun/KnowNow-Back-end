@@ -29,7 +29,8 @@ class CourseContainRequest extends FormRequest
             'pdf' => 'nullable|file|mimes:pdf',
             'course_id' => 'required',
             'is_free' => 'required',
-            'is_theoretical' => 'required'
+            'is_theoretical' => 'required',
+            'number' => 'required|integer'
         ];
     }
     protected function failedValidation(Validator $validator)

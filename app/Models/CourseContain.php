@@ -20,7 +20,8 @@ class CourseContain extends Model
         'pdf',
         'course_id',
         'is_free',
-        'is_theoretical'
+        'is_theoretical',
+        'number'
     ];
 
     /**

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('video');
+            $table->integer('number'); // إضافة عمود الرقم
             $table->text('pdf')->nullable();
             $table->unsignedBigInteger('course_id');
             $table->boolean('is_free');
@@ -22,6 +23,7 @@ return new class extends Migration
             $table->boolean('is_theoretical');
 
             $table->timestamps();
+            $table->unique(['number', 'course_id']);
             $table->foreign('course_id')->references('id')->on('courses');
         });
     }
